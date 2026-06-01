@@ -326,12 +326,27 @@ private void ambilDataDariTabel() {
     if (baris >= 0) {
         txtidTunjangan.setText(tblTunjangan.getValueAt(baris, 0).toString());
         txtNamaTunjangan.setText(tblTunjangan.getValueAt(baris, 1).toString());
-        txtNominalTunjangan.setText(tblTunjangan.getValueAt(baris, 2).toString());
+        
+        // Ambil nominal asli dari database, bukan dari tabel yang sudah diformat
+        try {
+            String idTunjangan = tblTunjangan.getValueAt(baris, 0).toString();
+            Connection conn = Koneksi.getConnection();
+            PreparedStatement pst = conn.prepareStatement(
+                "SELECT nominal FROM tunjangan WHERE id_tunjangan = ?"
+            );
+            pst.setString(1, idTunjangan);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                txtNominalTunjangan.setText(String.format("%.0f", rs.getDouble("nominal")));
+            }
+        } catch (Exception e) {}
 
-        String jabatan = tblTunjangan.getValueAt(baris, 3).toString();
+        String jabatan = tblTunjangan.getValueAt(baris, 3) != null ? 
+            tblTunjangan.getValueAt(baris, 3).toString() : "";
         cmbJabatan.setSelectedItem(jabatan);
 
-        txtKeterangan.setText(tblTunjangan.getValueAt(baris, 4).toString());
+        txtKeterangan.setText(tblTunjangan.getValueAt(baris, 4) != null ? 
+            tblTunjangan.getValueAt(baris, 4).toString() : "");
 
         jButton5.setEnabled(false);
         btnUbah.setEnabled(true);
