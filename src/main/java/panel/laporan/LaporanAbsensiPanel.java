@@ -18,6 +18,10 @@ public class LaporanAbsensiPanel extends javax.swing.JPanel {
     loadKaryawan();
     loadStatus();
     tampilData();
+    
+    cmbKaryawan.addActionListener(e -> filterData());
+    cmbStatus.addActionListener(e -> filterData());
+
 }
     
     private void styleButton() {
@@ -77,7 +81,7 @@ private void tampilData() {
 
     try {
         String sql = "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
-                + "a.jam_masuk, a.jam_pulang, a.status "
+                + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
                 + "FROM absensi a "
                 + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
                 + "ORDER BY a.tanggal DESC";
@@ -94,7 +98,7 @@ private void tampilData() {
                 rs.getString("jam_masuk"),
                 rs.getString("jam_pulang"),
                 rs.getString("status"),
-                ""
+                rs.getString("keterangan") != null ? rs.getString("keterangan") : ""
             });
         }
         tblLaporanAbsensi.setModel(model);
@@ -114,9 +118,9 @@ private void filterData() {
     model.addColumn("Keterangan");
 
     try {
-        StringBuilder sql = new StringBuilder(
+       StringBuilder sql = new StringBuilder(
             "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
-            + "a.jam_masuk, a.jam_pulang, a.status "
+            + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
             + "FROM absensi a "
             + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
             + "WHERE 1=1 "
@@ -168,11 +172,11 @@ private void cariData() {
 
     try {
         String sql = "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
-                + "a.jam_masuk, a.jam_pulang, a.status "
-                + "FROM absensi a "
-                + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
-                + "WHERE k.nama_karyawan LIKE ? OR a.tanggal LIKE ? OR a.status LIKE ? "
-                + "ORDER BY a.tanggal DESC";
+            + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
+            + "FROM absensi a "
+            + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
+            + "WHERE k.nama_karyawan LIKE ? OR a.tanggal LIKE ? OR a.status LIKE ? "
+            + "ORDER BY a.tanggal DESC";
 
         Connection conn = Koneksi.getConnection();
         PreparedStatement pst = conn.prepareStatement(sql);
