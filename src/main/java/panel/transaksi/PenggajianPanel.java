@@ -20,6 +20,7 @@ public class PenggajianPanel extends javax.swing.JPanel {
     loadBulan();
     tampilData();
     resetForm();
+    util.DesignUtil.applyPage(this);
 
     tblPenggajian.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -945,4 +946,3 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
     private javax.swing.JTextField txtTunjangan;
     // End of variables declaration//GEN-END:variables
 }
-

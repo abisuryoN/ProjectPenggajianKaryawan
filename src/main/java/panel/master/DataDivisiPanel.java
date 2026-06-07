@@ -17,6 +17,7 @@ public class DataDivisiPanel extends javax.swing.JPanel {
         styleButton();
         tampilData();
         resetForm();
+        util.DesignUtil.applyPage(this);
         
         tblDivisi.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {

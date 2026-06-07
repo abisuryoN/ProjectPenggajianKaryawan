@@ -18,6 +18,7 @@ public class LaporanAbsensiPanel extends javax.swing.JPanel {
     loadKaryawan();
     loadStatus();
     tampilData();
+    util.DesignUtil.applyPage(this);
     
     cmbKaryawan.addActionListener(e -> filterData());
     cmbStatus.addActionListener(e -> filterData());

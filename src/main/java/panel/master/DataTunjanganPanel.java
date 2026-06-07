@@ -18,6 +18,7 @@ public class DataTunjanganPanel extends javax.swing.JPanel {
     styleButton();
     tampilData();
     resetForm();
+    util.DesignUtil.applyPage(this);
 
     tblTunjangan.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {

@@ -19,6 +19,7 @@ public class LaporanGajiPanel extends javax.swing.JPanel {
     loadBulan();
     tampilData();
     txtTahun.setText(String.valueOf(java.time.LocalDate.now().getYear()));
+    util.DesignUtil.applyPage(this);
 }
   
   private void styleButton() {

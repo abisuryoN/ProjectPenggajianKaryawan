@@ -23,6 +23,7 @@ public class DashboardFrame extends JFrame {
         setTitle("Dashboard - " + Session.getNama());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1366, 768);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
@@ -32,14 +33,21 @@ public class DashboardFrame extends JFrame {
         SidebarPanel sidebarPanel = new SidebarPanel(this);
 
         JScrollPane sidebarScroll = new JScrollPane(sidebarPanel);
-        sidebarScroll.setPreferredSize(new Dimension(270, 0));
+        sidebarScroll.setPreferredSize(new Dimension(240, 0));
         sidebarScroll.setBorder(BorderFactory.createEmptyBorder());
         sidebarScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         sidebarScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         sidebarScroll.getVerticalScrollBar().setUnitIncrement(16);
 
+        JScrollPane contentScroll = new JScrollPane(contentPanel);
+        contentScroll.setBorder(BorderFactory.createEmptyBorder());
+        contentScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        contentScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        contentScroll.getVerticalScrollBar().setUnitIncrement(16);
+        contentScroll.getHorizontalScrollBar().setUnitIncrement(16);
+
         add(sidebarScroll, BorderLayout.WEST);
-        add(contentPanel, BorderLayout.CENTER);
+        add(contentScroll, BorderLayout.CENTER);
 
         tampilHome();
     }

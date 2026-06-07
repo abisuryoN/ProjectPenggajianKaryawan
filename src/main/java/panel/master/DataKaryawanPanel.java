@@ -19,6 +19,7 @@ public class DataKaryawanPanel extends javax.swing.JPanel {
     loadDivisi();
     tampilData();
     resetForm();
+    util.DesignUtil.applyPage(this);
     
     tblKaryawan.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {

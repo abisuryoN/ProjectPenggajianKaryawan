@@ -33,7 +33,7 @@ public class SidebarPanel extends JPanel {
     private void initUI() {
         setBackground(new Color(28, 40, 58));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createEmptyBorder(24, 16, 24, 16));
+        setBorder(BorderFactory.createEmptyBorder(24, 12, 24, 12));
 
         JLabel title = new JLabel("PenggajianApp");
         title.setForeground(Color.WHITE);
@@ -103,9 +103,9 @@ public class SidebarPanel extends JPanel {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
         button.setHorizontalAlignment(JButton.LEFT);
-        button.setMaximumSize(new Dimension(235, 40));
-        button.setPreferredSize(new Dimension(235, 40));
-        button.setMinimumSize(new Dimension(235, 40));
+        button.setMaximumSize(new Dimension(210, 40));
+        button.setPreferredSize(new Dimension(210, 40));
+        button.setMinimumSize(new Dimension(210, 40));
         button.setBackground(new Color(245, 248, 252));
         button.setForeground(new Color(42, 52, 66));
         button.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -124,6 +124,6 @@ public class SidebarPanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        return new Dimension(255, size.height);
+        return new Dimension(225, size.height);
     }
 }

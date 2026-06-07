@@ -16,6 +16,7 @@ public class LaporanKaryawanPanel extends javax.swing.JPanel {
     initComponents();
     styleButton();
     tampilData();
+    util.DesignUtil.applyPage(this);
     
     btnCari.addActionListener(e -> cariData());
     btnRefresh.addActionListener(e -> tampilData());
