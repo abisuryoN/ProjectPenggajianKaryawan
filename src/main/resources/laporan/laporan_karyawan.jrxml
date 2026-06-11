@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="laporan_karyawan" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="21c4dba0-742b-4118-a59b-51bce32b3ff1">
+    <style name="Base" fontName="SansSerif" fontSize="8" forecolor="#000000"/>
+    <style name="Title" style="Base" fontSize="16" isBold="true"/>
+    <style name="Header" style="Base" isBold="true"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT k.id_karyawan, k.nik, k.nama_karyawan, k.jenis_kelamin, k.alamat, k.no_hp,
+       d.nama_divisi, j.nama_jabatan
+FROM karyawan k
+LEFT JOIN divisi d ON d.id_divisi = k.id_divisi
+LEFT JOIN jabatan j ON j.id_jabatan = k.id_jabatan
+ORDER BY k.id_karyawan ASC
+        ]]>
+    </queryString>
+    <field name="id_karyawan" class="java.lang.Integer"/>
+    <field name="nik" class="java.lang.String"/>
+    <field name="nama_karyawan" class="java.lang.String"/>
+    <field name="jenis_kelamin" class="java.lang.String"/>
+    <field name="alamat" class="java.lang.String"/>
+    <field name="no_hp" class="java.lang.String"/>
+    <field name="nama_divisi" class="java.lang.String"/>
+    <field name="nama_jabatan" class="java.lang.String"/>
+
+    <title>
+        <band height="48">
+            <staticText><reportElement style="Title" x="0" y="0" width="802" height="24" uuid="ad222e89-7686-43b5-9a44-ee08226ba596"/><textElement textAlignment="Center"/><text><![CDATA[LAPORAN DATA KARYAWAN]]></text></staticText>
+            <line><reportElement x="0" y="36" width="802" height="1" uuid="3f2c62eb-4c54-4364-88f1-4615a028217e"/></line>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="Header" x="0" y="0" width="28" height="24" uuid="c329c3e9-b3e1-4b8e-a119-8554d4f5dc1e"/><box><pen lineWidth="0.5"/></box><text><![CDATA[No]]></text></staticText>
+            <staticText><reportElement style="Header" x="28" y="0" width="50" height="24" uuid="94b53a77-3338-4b0f-9a5b-8bd34b6d4cde"/><box><pen lineWidth="0.5"/></box><text><![CDATA[ID]]></text></staticText>
+            <staticText><reportElement style="Header" x="78" y="0" width="80" height="24" uuid="f32bdfec-4606-4bfb-a176-18679720f6cc"/><box><pen lineWidth="0.5"/></box><text><![CDATA[NIK]]></text></staticText>
+            <staticText><reportElement style="Header" x="158" y="0" width="145" height="24" uuid="2fb3338c-cc1f-49a1-9d01-01fe226d5c72"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Nama Karyawan]]></text></staticText>
+            <staticText><reportElement style="Header" x="303" y="0" width="82" height="24" uuid="d9e777dd-28b4-40d1-981a-38e07b5524c1"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Jenis Kelamin]]></text></staticText>
+            <staticText><reportElement style="Header" x="385" y="0" width="90" height="24" uuid="eafc3541-f87f-474f-968d-e2cc8643f124"/><box><pen lineWidth="0.5"/></box><text><![CDATA[No. HP]]></text></staticText>
+            <staticText><reportElement style="Header" x="475" y="0" width="95" height="24" uuid="a2d720a0-cd7a-40e4-8c98-b63ad790cb41"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Jabatan]]></text></staticText>
+            <staticText><reportElement style="Header" x="570" y="0" width="95" height="24" uuid="a25fdaf8-ec42-4fb1-bddf-12005e66bd12"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Divisi]]></text></staticText>
+            <staticText><reportElement style="Header" x="665" y="0" width="137" height="24" uuid="23ef24eb-9842-4ff8-887d-a882a0db989d"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Alamat]]></text></staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="22">
+            <textField><reportElement style="Base" x="0" y="0" width="28" height="22" uuid="de70d3f2-3290-4309-b10b-db367620029b"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="28" y="0" width="50" height="22" uuid="f7c1df52-95eb-4a06-baf3-617d5e774489"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{id_karyawan}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="78" y="0" width="80" height="22" uuid="945a0d23-c7dd-4fed-85b3-993ce5607e63"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{nik}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="158" y="0" width="145" height="22" uuid="d89dc313-7c53-4f2d-b1a2-aa828376fcca"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{nama_karyawan}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="303" y="0" width="82" height="22" uuid="c80dba7a-d418-4e6d-8b4d-4951454c1228"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{jenis_kelamin}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="385" y="0" width="90" height="22" uuid="41bfc3ed-dced-4e1f-a3ca-a63107080f7d"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{no_hp}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="475" y="0" width="95" height="22" uuid="ef769a51-0ea3-4088-9d0d-55597bdd1a3b"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{nama_jabatan}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="570" y="0" width="95" height="22" uuid="7a1a7753-4218-462b-b56e-5fbecdb4f2f2"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{nama_divisi}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="665" y="0" width="137" height="22" uuid="d7e04009-182d-42f7-883f-621474d07e9f"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{alamat}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

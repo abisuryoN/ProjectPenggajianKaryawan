@@ -21,8 +21,8 @@ public class LaporanKaryawanPanel extends javax.swing.JPanel {
     btnCari.addActionListener(e -> cariData());
     btnRefresh.addActionListener(e -> tampilData());
     btnReset.addActionListener(e -> { txtCari.setText(""); tampilData(); });
-    btnExportPDF.addActionListener(e -> exportPDF());
-    btncetak.addActionListener(e -> exportPDF());
+    btnExportPDF.addActionListener(e -> cetakLaporanJasper());
+    btncetak.addActionListener(e -> cetakLaporanJasper());
     
     // Biar bisa scroll kanan kiri
     tblAbsensi.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
@@ -220,6 +220,14 @@ private void exportPDF() {
 
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal export PDF: " + e.getMessage());
+    }
+}
+
+private void cetakLaporanJasper() {
+    try {
+        util.ReportUtil.showReport("laporan_karyawan", new java.util.HashMap<String, Object>());
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal membuka laporan karyawan: " + e.getMessage());
     }
 }
 

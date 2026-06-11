@@ -270,6 +270,22 @@ private void exportPDF() {
     }
 }
 
+private void cetakLaporanJasper() {
+    try {
+        java.util.Map<String, Object> params = new java.util.HashMap<>();
+        params.put("id_karyawan", null);
+        params.put("status", cmbStatus.getSelectedIndex() > 0 ? cmbStatus.getSelectedItem().toString() : null);
+        params.put("keyword", txtCari.getText().trim().isEmpty() ? null : txtCari.getText().trim());
+        if (cmbKaryawan.getSelectedIndex() > 0) {
+            String selected = cmbKaryawan.getSelectedItem().toString();
+            params.put("id_karyawan", Integer.parseInt(selected.split(" - ")[0]));
+        }
+        util.ReportUtil.showReport("laporan_absensi", params);
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal membuka laporan absensi: " + e.getMessage());
+    }
+}
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code manually kalau masih mau pakai tab Design NetBeans.
@@ -577,11 +593,11 @@ private void exportPDF() {
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnExportPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportPDFActionPerformed
-        exportPDF();
+        cetakLaporanJasper();
     }//GEN-LAST:event_btnExportPDFActionPerformed
 
     private void btnCetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakActionPerformed
-        exportPDF();
+        cetakLaporanJasper();
     }//GEN-LAST:event_btnCetakActionPerformed
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="laporan_divisi" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="b011529d-85c2-4d6f-bf87-1a78ce35670f">
+    <style name="Base" fontName="SansSerif" fontSize="9" forecolor="#000000"/>
+    <style name="Title" style="Base" fontSize="16" isBold="true"/>
+    <style name="Header" style="Base" isBold="true"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT d.id_divisi, d.nama_divisi, COALESCE(d.kepala_divisi, '') AS kepala_divisi, d.keterangan, COUNT(k.id_karyawan) AS jumlah_karyawan
+FROM divisi d
+LEFT JOIN karyawan k ON k.id_divisi = d.id_divisi
+GROUP BY d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan
+ORDER BY d.id_divisi ASC
+        ]]>
+    </queryString>
+    <field name="id_divisi" class="java.lang.Integer"/>
+    <field name="nama_divisi" class="java.lang.String"/>
+    <field name="kepala_divisi" class="java.lang.String"/>
+    <field name="jumlah_karyawan" class="java.lang.Long"/>
+    <field name="keterangan" class="java.lang.String"/>
+
+    <title>
+        <band height="48">
+            <staticText><reportElement style="Title" x="0" y="0" width="802" height="24" uuid="f9af8c94-081c-473f-a616-8f8ab7f824e0"/><textElement textAlignment="Center"/><text><![CDATA[LAPORAN DATA DIVISI]]></text></staticText>
+            <line><reportElement x="0" y="36" width="802" height="1" uuid="c1053724-7213-4ea7-bc21-51c4c34c5b87"/></line>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement style="Header" x="0" y="0" width="40" height="24" uuid="0e5c902d-44fe-47a4-95c7-28893d031b9d"/><box><pen lineWidth="0.5"/></box><text><![CDATA[No]]></text></staticText>
+            <staticText><reportElement style="Header" x="40" y="0" width="90" height="24" uuid="22a15d74-ad77-4acf-929b-f536364059d6"/><box><pen lineWidth="0.5"/></box><text><![CDATA[ID Divisi]]></text></staticText>
+            <staticText><reportElement style="Header" x="130" y="0" width="210" height="24" uuid="fa2c2064-1692-4b5f-9704-0c086630ddf1"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Nama Divisi]]></text></staticText>
+            <staticText><reportElement style="Header" x="340" y="0" width="170" height="24" uuid="ae528f4f-b6d9-43c9-86a8-24de2867b9a9"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Kepala Divisi]]></text></staticText>
+            <staticText><reportElement style="Header" x="510" y="0" width="120" height="24" uuid="85be3673-b3ca-49f4-8d74-5f6cca5022af"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Jumlah Karyawan]]></text></staticText>
+            <staticText><reportElement style="Header" x="630" y="0" width="172" height="24" uuid="c3929d9e-b054-4f43-b9cd-1ec793b2fa37"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Keterangan]]></text></staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="22">
+            <textField><reportElement style="Base" x="0" y="0" width="40" height="22" uuid="6a61b112-48b1-4702-ac4a-409dd84317cb"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="40" y="0" width="90" height="22" uuid="313f8d06-40fd-4c00-a4b8-bdd591d89b97"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{id_divisi}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="130" y="0" width="210" height="22" uuid="f7a38dcd-f07e-4991-96ce-92b7ad9d8993"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{nama_divisi}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="340" y="0" width="170" height="22" uuid="04995993-d62d-433e-af8b-b88c56d29514"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{kepala_divisi}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="510" y="0" width="120" height="22" uuid="80c1ed08-3a80-446f-a7a2-62add36d6f7e"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center"/><textFieldExpression><![CDATA[$F{jumlah_karyawan}]]></textFieldExpression></textField>
+            <textField><reportElement style="Base" x="630" y="0" width="172" height="22" uuid="c52b2184-dc62-47bd-a4bc-587eb95a8771"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

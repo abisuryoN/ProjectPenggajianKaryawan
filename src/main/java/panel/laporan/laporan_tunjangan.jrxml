@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="laporan_tunjangan" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="36e84656-b9e1-43d6-908f-779ec0208793">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Koneksi DB Penggajian"/>
+	<style name="Base" forecolor="#000000" fontName="SansSerif" fontSize="9"/>
+	<style name="Title" style="Base" fontSize="16" isBold="true"/>
+	<style name="Header" style="Base" isBold="true"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT id_tunjangan, kode_tunjangan, nama_tunjangan, nominal
+FROM tunjangan
+ORDER BY id_tunjangan ASC]]>
+	</queryString>
+	<field name="id_tunjangan" class="java.lang.Integer"/>
+	<field name="kode_tunjangan" class="java.lang.String"/>
+	<field name="nama_tunjangan" class="java.lang.String"/>
+	<field name="nominal" class="java.math.BigDecimal"/>
+	<title>
+		<band height="48">
+			<staticText>
+				<reportElement style="Title" x="0" y="0" width="802" height="24" uuid="c15e36d5-3d8b-4e30-9992-d96207a3b509"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[LAPORAN DATA TUNJANGAN]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="36" width="802" height="1" uuid="aa99e2af-117c-4385-b9fb-cb47a09f2598"/>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="24">
+			<staticText>
+				<reportElement style="Header" x="0" y="0" width="40" height="24" uuid="fc642b62-a110-4fd1-8a55-2165f8d29834"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Header" x="40" y="0" width="120" height="24" uuid="926f7d90-9d19-4238-bfd0-525e79b4f932"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Kode]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Header" x="160" y="0" width="380" height="24" uuid="c6cb1304-4448-4a78-95d2-aa4d29841f2b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Nama Tunjangan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Header" x="540" y="0" width="160" height="24" uuid="535ffb4c-ce51-4fd4-a8e9-a67f17b16476"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[Nominal]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22">
+			<textField>
+				<reportElement style="Base" x="0" y="0" width="40" height="22" uuid="5b5f559a-c568-49a7-ab80-c96b29258a98"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Base" x="40" y="0" width="120" height="22" uuid="415deed7-4225-4277-85bc-477526f7b3a6"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{kode_tunjangan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Base" x="160" y="0" width="380" height="22" uuid="ac2f7b03-adc2-435c-9d76-bd818089c259"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{nama_tunjangan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement style="Base" x="540" y="0" width="160" height="22" uuid="e9029fc7-3d69-4d4d-8c2d-b3b8a5ad5e85"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{nominal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

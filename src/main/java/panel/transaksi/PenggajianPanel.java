@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Panel kosong untuk diedit lewat NetBeans GUI Builder.
@@ -307,143 +309,11 @@ private void cetakSlip() {
     }
 
     try {
-        Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(
-            "SELECT p.*, k.nama_karyawan, k.nik, j.nama_jabatan, d.nama_divisi "
-            + "FROM penggajian p "
-            + "JOIN karyawan k ON p.id_karyawan = k.id_karyawan "
-            + "LEFT JOIN jabatan j ON k.id_jabatan = j.id_jabatan "
-            + "LEFT JOIN divisi d ON k.id_divisi = d.id_divisi "
-            + "WHERE p.id_penggajian = ?"
-        );
-        pst.setString(1, idGaji);
-        ResultSet rs = pst.executeQuery();
-
-        if (rs.next()) {
-            String namaFile = "slip_gaji_" + rs.getString("nik") + "_" + rs.getString("periode") + ".pdf";
-            String desktopPath = System.getProperty("user.home") + "\\Downloads";
-            java.io.File desktop = new java.io.File(desktopPath);
-            if (!desktop.exists()) {
-                desktop.mkdirs();
-            }
-            String path = desktopPath + "\\" + namaFile;
-
-            com.itextpdf.text.Document doc = new com.itextpdf.text.Document();
-            com.itextpdf.text.pdf.PdfWriter.getInstance(doc, new java.io.FileOutputStream(path));
-            doc.open();
-
-            // Font
-            com.itextpdf.text.Font fontJudul = new com.itextpdf.text.Font(
-                com.itextpdf.text.Font.FontFamily.HELVETICA, 18, com.itextpdf.text.Font.BOLD);
-            com.itextpdf.text.Font fontSub = new com.itextpdf.text.Font(
-                com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.NORMAL);
-            com.itextpdf.text.Font fontBold = new com.itextpdf.text.Font(
-                com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD);
-            com.itextpdf.text.Font fontTotal = new com.itextpdf.text.Font(
-                com.itextpdf.text.Font.FontFamily.HELVETICA, 13, com.itextpdf.text.Font.BOLD,
-                new com.itextpdf.text.BaseColor(0, 128, 0));
-            com.itextpdf.text.Font fontPotongan = new com.itextpdf.text.Font(
-                com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.NORMAL,
-                new com.itextpdf.text.BaseColor(200, 0, 0));
-
-            // Header
-            com.itextpdf.text.Paragraph judul = new com.itextpdf.text.Paragraph("SLIP GAJI KARYAWAN", fontJudul);
-            judul.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
-            doc.add(judul);
-
-            com.itextpdf.text.Paragraph periode = new com.itextpdf.text.Paragraph(
-                "Periode: " + rs.getString("periode"), fontSub);
-            periode.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
-            doc.add(periode);
-            doc.add(com.itextpdf.text.Chunk.NEWLINE);
-
-            // Garis
-            com.itextpdf.text.pdf.draw.LineSeparator line = new com.itextpdf.text.pdf.draw.LineSeparator();
-            doc.add(new com.itextpdf.text.Chunk(line));
-            doc.add(com.itextpdf.text.Chunk.NEWLINE);
-
-            // Tabel info karyawan
-            com.itextpdf.text.pdf.PdfPTable tabelInfo = new com.itextpdf.text.pdf.PdfPTable(2);
-            tabelInfo.setWidthPercentage(100);
-            tabelInfo.setWidths(new float[]{40, 60});
-            tabelInfo.getDefaultCell().setBorder(com.itextpdf.text.pdf.PdfPCell.NO_BORDER);
-            tabelInfo.getDefaultCell().setPadding(4);
-
-            addRowInfo(tabelInfo, "Nama Karyawan", rs.getString("nama_karyawan"), fontSub, fontBold);
-            addRowInfo(tabelInfo, "NIK", rs.getString("nik"), fontSub, fontBold);
-            addRowInfo(tabelInfo, "Jabatan", rs.getString("nama_jabatan"), fontSub, fontBold);
-            addRowInfo(tabelInfo, "Divisi", rs.getString("nama_divisi"), fontSub, fontBold);
-            addRowInfo(tabelInfo, "Tanggal Gaji", rs.getString("tanggal_gaji"), fontSub, fontBold);
-            doc.add(tabelInfo);
-            doc.add(com.itextpdf.text.Chunk.NEWLINE);
-
-            // Garis
-            doc.add(new com.itextpdf.text.Chunk(line));
-            doc.add(com.itextpdf.text.Chunk.NEWLINE);
-
-            // Tabel gaji
-            com.itextpdf.text.pdf.PdfPTable tabelGaji = new com.itextpdf.text.pdf.PdfPTable(2);
-            tabelGaji.setWidthPercentage(100);
-            tabelGaji.setWidths(new float[]{40, 60});
-            tabelGaji.getDefaultCell().setBorder(com.itextpdf.text.pdf.PdfPCell.NO_BORDER);
-            tabelGaji.getDefaultCell().setPadding(4);
-
-            addRowInfo(tabelGaji, "Gaji Pokok", formatRupiah(rs.getString("gaji_pokok")), fontSub, fontBold);
-            addRowInfo(tabelGaji, "Tunjangan", formatRupiah(rs.getString("total_tunjangan")), fontSub, fontBold);
-
-            // Baris potongan warna merah
-            com.itextpdf.text.pdf.PdfPCell cellLabelPot = new com.itextpdf.text.pdf.PdfPCell(
-                new com.itextpdf.text.Phrase("Potongan", fontSub));
-            cellLabelPot.setBorder(com.itextpdf.text.pdf.PdfPCell.NO_BORDER);
-            cellLabelPot.setPadding(4);
-            com.itextpdf.text.pdf.PdfPCell cellValPot = new com.itextpdf.text.pdf.PdfPCell(
-                new com.itextpdf.text.Phrase("- " + formatRupiah(rs.getString("potongan")), fontPotongan));
-            cellValPot.setBorder(com.itextpdf.text.pdf.PdfPCell.NO_BORDER);
-            cellValPot.setPadding(4);
-            tabelGaji.addCell(cellLabelPot);
-            tabelGaji.addCell(cellValPot);
-
-            doc.add(tabelGaji);
-            doc.add(com.itextpdf.text.Chunk.NEWLINE);
-
-            // Garis
-            doc.add(new com.itextpdf.text.Chunk(line));
-            doc.add(com.itextpdf.text.Chunk.NEWLINE);
-
-            // Total gaji
-            com.itextpdf.text.pdf.PdfPTable tabelTotal = new com.itextpdf.text.pdf.PdfPTable(2);
-            tabelTotal.setWidthPercentage(100);
-            tabelTotal.setWidths(new float[]{40, 60});
-            tabelTotal.getDefaultCell().setBorder(com.itextpdf.text.pdf.PdfPCell.NO_BORDER);
-            tabelTotal.getDefaultCell().setPadding(6);
-
-            com.itextpdf.text.pdf.PdfPCell cellTotalLabel = new com.itextpdf.text.pdf.PdfPCell(
-                new com.itextpdf.text.Phrase("TOTAL GAJI", fontTotal));
-            cellTotalLabel.setBorder(com.itextpdf.text.pdf.PdfPCell.NO_BORDER);
-            cellTotalLabel.setPadding(6);
-            com.itextpdf.text.pdf.PdfPCell cellTotalVal = new com.itextpdf.text.pdf.PdfPCell(
-                new com.itextpdf.text.Phrase(formatRupiah(rs.getString("total_gaji")), fontTotal));
-            cellTotalVal.setBorder(com.itextpdf.text.pdf.PdfPCell.NO_BORDER);
-            cellTotalVal.setPadding(6);
-            tabelTotal.addCell(cellTotalLabel);
-            tabelTotal.addCell(cellTotalVal);
-            doc.add(tabelTotal);
-
-            doc.add(com.itextpdf.text.Chunk.NEWLINE);
-            com.itextpdf.text.Paragraph footer = new com.itextpdf.text.Paragraph(
-                "Dicetak pada: " + java.time.LocalDate.now(), fontSub);
-            footer.setAlignment(com.itextpdf.text.Element.ALIGN_RIGHT);
-            doc.add(footer);
-
-            doc.close();
-            
-            java.io.File filePdf = new java.io.File(path);
-            if (java.awt.Desktop.isDesktopSupported()) {
-                java.awt.Desktop.getDesktop().open(filePdf);
-            }
-
-            JOptionPane.showMessageDialog(this, "Slip gaji berhasil disimpan di Desktop:\n" + namaFile);
-        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("id_gaji", Integer.parseInt(idGaji));
+        util.ReportUtil.showReport("slip_gaji", params);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "ID gaji harus berupa angka.");
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal cetak slip: " + e.getMessage());
     }

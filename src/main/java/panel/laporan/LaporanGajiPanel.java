@@ -3,6 +3,8 @@ import config.Koneksi;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -259,6 +261,20 @@ private void exportPDF() {
 
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal export PDF: " + e.getMessage());
+    }
+}
+
+private void cetakLaporanJasper() {
+    try {
+        Map<String, Object> params = new HashMap<>();
+        String tahun = txtTahun.getText().trim();
+        params.put("tahun", tahun.isEmpty() ? null : tahun);
+        params.put("bulan", cmbBulan.getSelectedIndex() > 0
+                ? String.format("%02d", cmbBulan.getSelectedIndex())
+                : null);
+        util.ReportUtil.showReport("laporan_penggajian", params);
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal membuka laporan penggajian: " + e.getMessage());
     }
 }
 
@@ -645,7 +661,7 @@ private void exportPDF() {
     }//GEN-LAST:event_txtTahunActionPerformed
 
     private void btnCetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakActionPerformed
-       exportPDF();
+       cetakLaporanJasper();
     }//GEN-LAST:event_btnCetakActionPerformed
 
     private void btnCetakSlipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakSlipActionPerformed
@@ -653,7 +669,7 @@ private void exportPDF() {
     }//GEN-LAST:event_btnCetakSlipActionPerformed
 
     private void btnExportPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportPDFActionPerformed
-        exportPDF();
+        cetakLaporanJasper();
     }//GEN-LAST:event_btnExportPDFActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
