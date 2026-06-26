@@ -1,6 +1,5 @@
 package panel.dashboard;
 
-import auth.Session;
 import config.Koneksi;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,7 +56,7 @@ public class HomeKaryawanPanel extends JPanel {
         title.setFont(new Font("Segoe UI", Font.BOLD, 28));
         title.setForeground(new Color(22, 48, 92));
 
-        JLabel welcome = new JLabel("Selamat datang, " + Session.getNama());
+        JLabel welcome = new JLabel("Selamat datang, " + util.Session.getNamaKaryawan());
         welcome.setFont(new Font("Segoe UI", Font.PLAIN, 17));
         welcome.setForeground(new Color(84, 96, 110));
 
@@ -79,7 +78,7 @@ public class HomeKaryawanPanel extends JPanel {
         JPanel grid = new JPanel(new GridLayout(1, 3, 16, 0));
         grid.setOpaque(false);
         grid.add(createStatCard(getKehadiranBulanIni() + " Hari", "Kehadiran Bulan Ini"));
-        grid.add(createStatCard("0 Hari", "Izin / Cuti"));
+        grid.add(createStatCard(getIzinCutiBulanIni() + " Hari", "Izin / Cuti"));
         grid.add(createStatCard(getEstimasiGaji(), "Estimasi Gaji"));
         return grid;
     }
@@ -139,10 +138,27 @@ public class HomeKaryawanPanel extends JPanel {
 
     private int getKehadiranBulanIni() {
         try {
-            int idKaryawan = Session.getIdKaryawan();
+            int idKaryawan = util.Session.getIdKaryawan();
             Connection conn = Koneksi.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                 "SELECT COUNT(*) FROM absensi WHERE id_karyawan = ? "
+                + "AND status = 'Hadir' "
+                + "AND MONTH(tanggal) = MONTH(NOW()) AND YEAR(tanggal) = YEAR(NOW())"
+            );
+            pst.setInt(1, idKaryawan);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {}
+        return 0;
+    }
+
+    private int getIzinCutiBulanIni() {
+        try {
+            int idKaryawan = util.Session.getIdKaryawan();
+            Connection conn = Koneksi.getConnection();
+            PreparedStatement pst = conn.prepareStatement(
+                "SELECT COUNT(*) FROM absensi WHERE id_karyawan = ? "
+                + "AND status IN ('Izin', 'Cuti') "
                 + "AND MONTH(tanggal) = MONTH(NOW()) AND YEAR(tanggal) = YEAR(NOW())"
             );
             pst.setInt(1, idKaryawan);
@@ -154,7 +170,7 @@ public class HomeKaryawanPanel extends JPanel {
 
     private String getEstimasiGaji() {
         try {
-            int idKaryawan = Session.getIdKaryawan();
+            int idKaryawan = util.Session.getIdKaryawan();
             Connection conn = Koneksi.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                 "SELECT j.gaji_pokok FROM karyawan k "

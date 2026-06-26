@@ -1,6 +1,5 @@
 package view;
 
-import auth.Session;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +19,8 @@ public class DashboardFrame extends JFrame {
     }
 
     private void initUI() {
-        setTitle("Dashboard - " + Session.getNama());
+        // ✅ Ganti auth.Session -> util.Session dan getNama() -> getNamaKaryawan()
+        setTitle("Dashboard - " + util.Session.getNamaKaryawan());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1366, 768);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -31,7 +31,6 @@ public class DashboardFrame extends JFrame {
         contentPanel.setBackground(new Color(244, 247, 250));
 
         SidebarPanel sidebarPanel = new SidebarPanel(this);
-
         JScrollPane sidebarScroll = new JScrollPane(sidebarPanel);
         sidebarScroll.setPreferredSize(new Dimension(240, 0));
         sidebarScroll.setBorder(BorderFactory.createEmptyBorder());
@@ -60,7 +59,8 @@ public class DashboardFrame extends JFrame {
     }
 
     public void tampilHome() {
-        if (Session.isHRD()) {
+        // ✅ Ganti Session.isHRD() -> cek role dari util.Session
+        if ("HRD".equalsIgnoreCase(util.Session.getRole())) {
             tampilPanel(new HomeHRDPanel());
         } else {
             tampilPanel(new HomeKaryawanPanel());
@@ -68,7 +68,8 @@ public class DashboardFrame extends JFrame {
     }
 
     public void logout() {
-        Session.clear();
+        // ✅ Ganti Session.clear() -> util.Session.logout()
+        util.Session.logout();
         dispose();
         new LoginFrame().setVisible(true);
     }

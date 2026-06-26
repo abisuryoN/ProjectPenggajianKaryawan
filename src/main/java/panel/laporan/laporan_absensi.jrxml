@@ -5,6 +5,8 @@
 	<style name="Base" fontName="SansSerif" fontSize="9"/>
 	<style name="Title" fontName="SansSerif" fontSize="16" isBold="true"/>
 	<style name="Header" fontName="SansSerif" fontSize="9" isBold="true"/>
+	<parameter name="tanggal_awal" class="java.sql.Date"/>
+	<parameter name="tanggal_akhir" class="java.sql.Date"/>
 	<parameter name="id_karyawan" class="java.lang.Integer"/>
 	<parameter name="status" class="java.lang.String">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
@@ -21,6 +23,14 @@
        COALESCE(a.keterangan, '') AS keterangan
 FROM absensi a
 LEFT JOIN karyawan k ON a.id_karyawan = k.id_karyawan
+WHERE ($P{tanggal_awal} IS NULL OR a.tanggal >= $P{tanggal_awal})
+  AND ($P{tanggal_akhir} IS NULL OR a.tanggal <= $P{tanggal_akhir})
+  AND ($P{id_karyawan} IS NULL OR a.id_karyawan = $P{id_karyawan})
+  AND ($P{status} IS NULL OR a.status = $P{status})
+  AND ($P{keyword} IS NULL OR k.nama_karyawan LIKE CONCAT('%', $P{keyword}, '%')
+       OR a.tanggal LIKE CONCAT('%', $P{keyword}, '%')
+       OR a.status LIKE CONCAT('%', $P{keyword}, '%')
+       OR COALESCE(a.keterangan, '') LIKE CONCAT('%', $P{keyword}, '%'))
 ORDER BY a.tanggal DESC, a.id_absensi DESC]]>
 	</queryString>
 	<field name="nama_karyawan" class="java.lang.String"/>

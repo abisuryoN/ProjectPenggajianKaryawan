@@ -40,24 +40,6 @@ public class ReportUtil {
     }
 
     private static JasperReport loadReport(String reportName) throws Exception {
-        String jasperPath = "/panel/laporan/" + reportName + ".jasper";
-        InputStream jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
-        if (jasperStream != null) {
-            return (JasperReport) JRLoader.loadObject(jasperStream);
-        }
-
-        jasperPath = "/laporan/" + reportName + ".jasper";
-        jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
-        if (jasperStream != null) {
-            return (JasperReport) JRLoader.loadObject(jasperStream);
-        }
-
-        jasperPath = "/reports/" + reportName + ".jasper";
-        jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
-        if (jasperStream != null) {
-            return (JasperReport) JRLoader.loadObject(jasperStream);
-        }
-
         String jrxmlPath = "/panel/laporan/" + reportName + ".jrxml";
         InputStream jrxmlStream = ReportUtil.class.getResourceAsStream(jrxmlPath);
         if (jrxmlStream != null) {
@@ -76,6 +58,24 @@ public class ReportUtil {
             return JasperCompileManager.compileReport(jrxmlStream);
         }
 
-        throw new IllegalArgumentException("File report tidak ditemukan: " + jasperPath);
+        String jasperPath = "/panel/laporan/" + reportName + ".jasper";
+        InputStream jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
+        if (jasperStream != null) {
+            return (JasperReport) JRLoader.loadObject(jasperStream);
+        }
+
+        jasperPath = "/laporan/" + reportName + ".jasper";
+        jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
+        if (jasperStream != null) {
+            return (JasperReport) JRLoader.loadObject(jasperStream);
+        }
+
+        jasperPath = "/reports/" + reportName + ".jasper";
+        jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
+        if (jasperStream != null) {
+            return (JasperReport) JRLoader.loadObject(jasperStream);
+        }
+
+        throw new IllegalArgumentException("File report tidak ditemukan: " + reportName);
     }
 }

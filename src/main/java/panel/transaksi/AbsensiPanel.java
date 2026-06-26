@@ -1,5 +1,4 @@
 package panel.transaksi;
-import auth.Session;
 import config.Koneksi;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -67,20 +66,18 @@ private void loadKaryawan() {
     cmbKaryawan.addItem("-- Pilih Karyawan --");
     try {
         Connection conn = Koneksi.getConnection();
-        // Kalau login sebagai karyawan, hanya tampilkan diri sendiri
         String sql;
-        if (Session.isHRD()) {
+        if ("HRD".equalsIgnoreCase(util.Session.getRole())) {
             sql = "SELECT id_karyawan, nama_karyawan FROM karyawan ORDER BY nama_karyawan";
         } else {
-            sql = "SELECT id_karyawan, nama_karyawan FROM karyawan WHERE id_karyawan = " + Session.getIdKaryawan();
+            sql = "SELECT id_karyawan, nama_karyawan FROM karyawan WHERE id_karyawan = " + util.Session.getIdKaryawan();
         }
         PreparedStatement pst = conn.prepareStatement(sql);
         ResultSet rs = pst.executeQuery();
         while (rs.next()) {
             cmbKaryawan.addItem(rs.getString("id_karyawan") + " - " + rs.getString("nama_karyawan"));
         }
-        // Auto pilih kalau karyawan
-        if (!Session.isHRD()) {
+        if (!"HRD".equalsIgnoreCase(util.Session.getRole())) {
             cmbKaryawan.setSelectedIndex(1);
         }
     } catch (Exception e) {
@@ -100,14 +97,14 @@ private void tampilData() {
 
     try {
         String sql;
-        if (Session.isHRD()) {
+        if ("HRD".equalsIgnoreCase(util.Session.getRole())) {
             sql = "SELECT a.*, k.nama_karyawan FROM absensi a "
                 + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
                 + "ORDER BY a.tanggal DESC, a.id_absensi DESC";
         } else {
             sql = "SELECT a.*, k.nama_karyawan FROM absensi a "
                 + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
-                + "WHERE a.id_karyawan = " + Session.getIdKaryawan()
+                + "WHERE a.id_karyawan = " + util.Session.getIdKaryawan()
                 + " ORDER BY a.tanggal DESC";
         }
         Connection conn = Koneksi.getConnection();
@@ -346,7 +343,7 @@ private void resetForm() {
     txtKeterangan.setText("");
     setTanggalHariIni();
     cmbStatus.setSelectedIndex(0);
-    if (Session.isHRD()) cmbKaryawan.setSelectedIndex(0);
+    if ("HRD".equalsIgnoreCase(util.Session.getRole())) cmbKaryawan.setSelectedIndex(0);
 
     btnSimpan.setEnabled(true);
     btnUbah.setEnabled(false);

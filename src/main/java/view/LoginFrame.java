@@ -232,19 +232,43 @@ public class LoginFrame extends JFrame {
     }
 
     private void prosesLogin() {
-        String username = txtUsername.getText().trim();
-        String password = new String(txtPassword.getPassword());
+    String username = txtUsername.getText().trim();
+    String password = new String(txtPassword.getPassword());
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username dan password wajib diisi.", "Peringatan", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    if (username.isEmpty() || password.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Username dan password wajib diisi.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        if (LoginService.login(username, password)) {
+    // ✅ Ganti dari LoginService.login() ke query langsung agar bisa set Session
+    try {
+        config.Koneksi.getConnection(); // pastikan koneksi ok
+        java.sql.Connection conn = config.Koneksi.getConnection();
+        java.sql.PreparedStatement pst = conn.prepareStatement(
+            "SELECT u.*, k.id_karyawan, k.nama_karyawan " +
+            "FROM users u " +
+            "JOIN karyawan k ON u.id_karyawan = k.id_karyawan " +
+            "WHERE u.username = ? AND u.password = ?"
+        );
+        pst.setString(1, username);
+        pst.setString(2, password);
+        java.sql.ResultSet rs = pst.executeQuery();
+
+        if (rs.next()) {
+            String role = rs.getString("role");
+            int idKaryawan = rs.getInt("id_karyawan");
+            String namaKaryawan = rs.getString("nama_karyawan");
+
+            // ✅ Set session
+            util.Session.login(idKaryawan, namaKaryawan, role);
+
             dispose();
             new DashboardFrame().setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this, "Username atau password salah.", "Login Gagal", JOptionPane.ERROR_MESSAGE);
         }
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error login: " + ex.getMessage());
     }
+}
 }

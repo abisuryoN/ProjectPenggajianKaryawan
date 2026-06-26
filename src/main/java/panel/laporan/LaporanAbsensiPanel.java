@@ -1,10 +1,14 @@
 package panel.laporan;
 import config.Koneksi;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  * Panel kosong untuk diedit lewat NetBeans GUI Builder.
@@ -17,8 +21,14 @@ public class LaporanAbsensiPanel extends javax.swing.JPanel {
     styleButton();
     loadKaryawan();
     loadStatus();
+    setupDateChooser();
     tampilData();
     util.DesignUtil.applyPage(this);
+    
+    // di konstruktor LaporanAbsensiPanel, setelah initComponents()
+    cmbKaryawan.setVisible(false);
+    jLabel4.setVisible(false); // label "Karyawan"
+    
     
     cmbKaryawan.addActionListener(e -> filterData());
     cmbStatus.addActionListener(e -> filterData());
@@ -68,9 +78,23 @@ private void loadStatus() {
     cmbStatus.addItem("Izin");
     cmbStatus.addItem("Sakit");
     cmbStatus.addItem("Alpha");
+    cmbStatus.addItem("Cuti");
 }
 
 private void tampilData() {
+    loadAbsensiData(false);
+}
+
+private void setupDateChooser() {
+    jDateChooser1.setDateFormatString("dd MMM yyyy");
+    jDateChooser2.setDateFormatString("dd MMM yyyy");
+    jDateChooser1.setDate(null);
+    jDateChooser2.setDate(null);
+    jDateChooser1.addPropertyChangeListener("date", e -> filterData());
+    jDateChooser2.addPropertyChangeListener("date", e -> filterData());
+}
+
+private DefaultTableModel createTableModel() {
     DefaultTableModel model = new DefaultTableModel();
     model.addColumn("NO");
     model.addColumn("Nama Karyawan");
@@ -79,16 +103,88 @@ private void tampilData() {
     model.addColumn("Jam Pulang");
     model.addColumn("Status");
     model.addColumn("Keterangan");
+    return model;
+}
+
+private Date getTanggalAwal() {
+    return jDateChooser1.getDate() == null ? null : new Date(jDateChooser1.getDate().getTime());
+}
+
+private Date getTanggalAkhir() {
+    return jDateChooser2.getDate() == null ? null : new Date(jDateChooser2.getDate().getTime());
+}
+
+private Integer getSelectedIdKaryawan() {
+    if (cmbKaryawan.getSelectedIndex() <= 0) {
+        return null;
+    }
+    String selected = cmbKaryawan.getSelectedItem().toString();
+    return Integer.parseInt(selected.split(" - ")[0]);
+}
+
+private String getSelectedStatus() {
+    return cmbStatus.getSelectedIndex() > 0 ? cmbStatus.getSelectedItem().toString() : null;
+}
+
+private boolean isTanggalValid(Date tanggalAwal, Date tanggalAkhir) {
+    if (tanggalAwal != null && tanggalAkhir != null && tanggalAwal.after(tanggalAkhir)) {
+        JOptionPane.showMessageDialog(this, "Tanggal awal tidak boleh lebih besar dari tanggal akhir.");
+        return false;
+    }
+    return true;
+}
+
+private void loadAbsensiData(boolean useFilter) {
+    DefaultTableModel model = createTableModel();
 
     try {
-        String sql = "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
-                + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
-                + "FROM absensi a "
-                + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
-                + "ORDER BY a.tanggal DESC";
+        Date tanggalAwal = useFilter ? getTanggalAwal() : null;
+        Date tanggalAkhir = useFilter ? getTanggalAkhir() : null;
+        if (!isTanggalValid(tanggalAwal, tanggalAkhir)) return;
+
+        // ✅ Ambil id karyawan dari session login
+        int idLoginKaryawan = util.Session.getIdKaryawan(); // sesuaikan
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
+            + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
+            + "FROM absensi a "
+            + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
+            + "WHERE a.id_karyawan = ? " // ✅ selalu filter by login user
+        );
+        List<Object> params = new ArrayList<>();
+        params.add(idLoginKaryawan); // ✅ tambahkan di index pertama
+
+        if (useFilter) {
+            // hapus getSelectedIdKaryawan() karena sudah dikunci
+            String status = getSelectedStatus();
+            String keyword = txtCari.getText().trim();
+
+            if (tanggalAwal != null) {
+                sql.append("AND a.tanggal >= ? ");
+                params.add(tanggalAwal);
+            }
+            if (tanggalAkhir != null) {
+                sql.append("AND a.tanggal <= ? ");
+                params.add(tanggalAkhir);
+            }
+            if (status != null) {
+                sql.append("AND a.status = ? ");
+                params.add(status);
+            }
+            if (!keyword.isEmpty()) {
+                sql.append("AND (a.tanggal LIKE ? OR a.status LIKE ? OR COALESCE(a.keterangan,'') LIKE ?) ");
+                String like = "%" + keyword + "%";
+                params.add(like); params.add(like); params.add(like);
+            }
+        }
+
+        sql.append("ORDER BY a.tanggal DESC");
 
         Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(sql);
+        PreparedStatement pst = conn.prepareStatement(sql.toString());
+        for (int i = 0; i < params.size(); i++) pst.setObject(i + 1, params.get(i));
+
         ResultSet rs = pst.executeQuery();
         int no = 1;
         while (rs.next()) {
@@ -109,98 +205,11 @@ private void tampilData() {
 }
 
 private void filterData() {
-    DefaultTableModel model = new DefaultTableModel();
-    model.addColumn("NO");
-    model.addColumn("Nama Karyawan");
-    model.addColumn("Tanggal");
-    model.addColumn("Jam Masuk");
-    model.addColumn("Jam Pulang");
-    model.addColumn("Status");
-    model.addColumn("Keterangan");
-
-    try {
-       StringBuilder sql = new StringBuilder(
-            "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
-            + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
-            + "FROM absensi a "
-            + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
-            + "WHERE 1=1 "
-        );
-
-        if (cmbKaryawan.getSelectedIndex() > 0) {
-            String selected = cmbKaryawan.getSelectedItem().toString();
-            int idKaryawan = Integer.parseInt(selected.split(" - ")[0]);
-            sql.append("AND a.id_karyawan = ").append(idKaryawan).append(" ");
-        }
-
-        if (cmbStatus.getSelectedIndex() > 0) {
-            sql.append("AND a.status = '").append(cmbStatus.getSelectedItem()).append("' ");
-        }
-
-        sql.append("ORDER BY a.tanggal DESC");
-
-        Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(sql.toString());
-        ResultSet rs = pst.executeQuery();
-        int no = 1;
-        while (rs.next()) {
-            model.addRow(new Object[]{
-                no++,
-                rs.getString("nama_karyawan"),
-                rs.getString("tanggal"),
-                rs.getString("jam_masuk"),
-                rs.getString("jam_pulang"),
-                rs.getString("status"),
-                ""
-            });
-        }
-        tblLaporanAbsensi.setModel(model);
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal filter data: " + e.getMessage());
-    }
+    loadAbsensiData(true);
 }
 
 private void cariData() {
-    String keyword = txtCari.getText().trim();
-    DefaultTableModel model = new DefaultTableModel();
-    model.addColumn("NO");
-    model.addColumn("Nama Karyawan");
-    model.addColumn("Tanggal");
-    model.addColumn("Jam Masuk");
-    model.addColumn("Jam Pulang");
-    model.addColumn("Status");
-    model.addColumn("Keterangan");
-
-    try {
-        String sql = "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
-            + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
-            + "FROM absensi a "
-            + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
-            + "WHERE k.nama_karyawan LIKE ? OR a.tanggal LIKE ? OR a.status LIKE ? "
-            + "ORDER BY a.tanggal DESC";
-
-        Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setString(1, "%" + keyword + "%");
-        pst.setString(2, "%" + keyword + "%");
-        pst.setString(3, "%" + keyword + "%");
-        ResultSet rs = pst.executeQuery();
-        int no = 1;
-        while (rs.next()) {
-            model.addRow(new Object[]{
-                no++,
-                rs.getString("nama_karyawan"),
-                rs.getString("tanggal"),
-                rs.getString("jam_masuk"),
-                rs.getString("jam_pulang"),
-                rs.getString("status"),
-                ""
-            });
-        }
-        tblLaporanAbsensi.setModel(model);
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal cari: " + e.getMessage());
-    }
+    filterData();
 }
 
 private void exportPDF() {
@@ -273,18 +282,22 @@ private void exportPDF() {
 private void cetakLaporanJasper() {
     try {
         java.util.Map<String, Object> params = new java.util.HashMap<>();
-        params.put("id_karyawan", null);
-        params.put("status", cmbStatus.getSelectedIndex() > 0 ? cmbStatus.getSelectedItem().toString() : null);
-        params.put("keyword", txtCari.getText().trim().isEmpty() ? null : txtCari.getText().trim());
-        if (cmbKaryawan.getSelectedIndex() > 0) {
-            String selected = cmbKaryawan.getSelectedItem().toString();
-            params.put("id_karyawan", Integer.parseInt(selected.split(" - ")[0]));
+        Date tanggalAwal = getTanggalAwal();
+        Date tanggalAkhir = getTanggalAkhir();
+        if (!isTanggalValid(tanggalAwal, tanggalAkhir)) {
+            return;
         }
+        params.put("tanggal_awal", tanggalAwal);
+        params.put("tanggal_akhir", tanggalAkhir);
+        params.put("id_karyawan", getSelectedIdKaryawan());
+        params.put("status", getSelectedStatus());
+        params.put("keyword", txtCari.getText().trim().isEmpty() ? null : txtCari.getText().trim());
         util.ReportUtil.showReport("laporan_absensi", params);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal membuka laporan absensi: " + e.getMessage());
     }
 }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -295,6 +308,7 @@ private void cetakLaporanJasper() {
     private void initComponents() {
 
         jLabel5 = new javax.swing.JLabel();
+        jCalendar1 = new com.toedter.calendar.JCalendar();
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -308,6 +322,8 @@ private void cetakLaporanJasper() {
         txtCari = new javax.swing.JTextField();
         btnFilter = new javax.swing.JButton();
         btnCari = new javax.swing.JButton();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
+        jDateChooser2 = new com.toedter.calendar.JDateChooser();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblLaporanAbsensi = new javax.swing.JTable();
@@ -375,12 +391,15 @@ private void cetakLaporanJasper() {
                     .addComponent(jLabel3)
                     .addComponent(jLabel2))
                 .addGap(56, 56, 56)
-                .addComponent(cmbKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(101, 101, 101)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cmbKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                    .addComponent(jDateChooser2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(39, 39, 39)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7))
-                .addGap(64, 64, 64)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel6))
+                .addGap(88, 88, 88)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(btnCari)
@@ -393,29 +412,33 @@ private void cetakLaporanJasper() {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel6)
-                        .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(19, 19, 19)
+                        .addContainerGap()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel7))
-                        .addGap(24, 24, 24)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(cmbKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(jLabel2)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel6)
+                                .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
                         .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnFilter)
-                            .addComponent(btnCari))))
+                            .addComponent(btnCari)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel7))
+                            .addComponent(jDateChooser2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(24, 24, 24)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(cmbKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
@@ -458,7 +481,7 @@ private void cetakLaporanJasper() {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -557,18 +580,19 @@ private void cetakLaporanJasper() {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(318, 318, 318)
+                        .addComponent(jLabel1)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(318, 318, 318))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addGap(14, 14, 14)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -577,7 +601,7 @@ private void cetakLaporanJasper() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCariActionPerformed
-        // TODO add your handling code here:
+        cariData();
     }//GEN-LAST:event_txtCariActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
@@ -589,7 +613,7 @@ private void cetakLaporanJasper() {
     }//GEN-LAST:event_btnCariActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-         tampilData();
+         filterData();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnExportPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportPDFActionPerformed
@@ -603,6 +627,8 @@ private void cetakLaporanJasper() {
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
         cmbKaryawan.setSelectedIndex(0);
         cmbStatus.setSelectedIndex(0);
+        jDateChooser1.setDate(null);
+        jDateChooser2.setDate(null);
         txtCari.setText("");
         tampilData();
     }//GEN-LAST:event_btnResetActionPerformed
@@ -621,6 +647,9 @@ private void cetakLaporanJasper() {
     private javax.swing.JButton btnReset;
     private javax.swing.JComboBox<String> cmbKaryawan;
     private javax.swing.JComboBox<String> cmbStatus;
+    private com.toedter.calendar.JCalendar jCalendar1;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
+    private com.toedter.calendar.JDateChooser jDateChooser2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

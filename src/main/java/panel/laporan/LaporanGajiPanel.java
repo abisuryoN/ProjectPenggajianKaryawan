@@ -22,6 +22,9 @@ public class LaporanGajiPanel extends javax.swing.JPanel {
     tampilData();
     txtTahun.setText(String.valueOf(java.time.LocalDate.now().getYear()));
     util.DesignUtil.applyPage(this);
+    
+    cmbKaryawan.setVisible(false);
+    jLabel5.setVisible(false);
 }
   
   private void styleButton() {
@@ -91,12 +94,16 @@ private void tampilData() {
     model.addColumn("Total Gaji");
 
     try {
+        int idLogin = util.Session.getIdKaryawan(); // ✅
+
         String sql = "SELECT p.*, k.nama_karyawan FROM penggajian p "
                 + "JOIN karyawan k ON p.id_karyawan = k.id_karyawan "
+                + "WHERE p.id_karyawan = ? " // ✅ filter by login user
                 + "ORDER BY p.id_penggajian DESC";
 
         Connection conn = Koneksi.getConnection();
         PreparedStatement pst = conn.prepareStatement(sql);
+        pst.setInt(1, idLogin); // ✅
         ResultSet rs = pst.executeQuery();
         int no = 1;
         while (rs.next()) {
@@ -149,7 +156,10 @@ private void filterData() {
             "SELECT p.*, k.nama_karyawan FROM penggajian p "
             + "JOIN karyawan k ON p.id_karyawan = k.id_karyawan WHERE 1=1 "
         );
-
+        
+        int idLogin = util.Session.getIdKaryawan(); // ✅
+        sql.append("AND p.id_karyawan = ").append(idLogin).append(" ");
+        
         if (cmbKaryawan.getSelectedIndex() > 0) {
             String selected = cmbKaryawan.getSelectedItem().toString();
             int idKaryawan = Integer.parseInt(selected.split(" - ")[0]);

@@ -6,234 +6,244 @@ import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-/**
- * Panel kosong untuk diedit lewat NetBeans GUI Builder.
- * Buka tab Design, lalu drag komponen sesuai kebutuhan.
- */
 public class DataJabatanPanel extends javax.swing.JPanel {
 
     public DataJabatanPanel() {
-    initComponents();
-    styleButton();
-    tampilData();
-    resetForm();
-    util.DesignUtil.applyPage(this);
-    
-    tblKaryawan.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            ambilDataDariTabel();
-        }
-    });
-    
-     btnRefresh.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
-            tampilData();
-            resetForm();
-        }
-    });
-}
-
-private void styleButton() {
-    styleFilledButton(btnSimpan, new java.awt.Color(20, 184, 166), java.awt.Color.WHITE);
-    styleFilledButton(btnUbah, new java.awt.Color(37, 99, 235), java.awt.Color.WHITE);
-    styleFilledButton(btnHapus, new java.awt.Color(239, 68, 68), java.awt.Color.WHITE);
-    styleFilledButton(btnReset, new java.awt.Color(243, 244, 246), new java.awt.Color(17, 24, 39));
-}
-
-private void styleFilledButton(javax.swing.JButton button, java.awt.Color bg, java.awt.Color fg) {
-    button.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-    button.setBackground(bg);
-    button.setForeground(fg);
-    button.setOpaque(true);
-    button.setContentAreaFilled(true);
-    button.setBorderPainted(false);
-    button.setFocusPainted(false);
-}
-
-private void tampilData() {
-    DefaultTableModel model = new DefaultTableModel();
-    model.addColumn("ID Jabatan");
-    model.addColumn("Nama Jabatan");
-    model.addColumn("Gaji Pokok");
-    model.addColumn("Keterangan");
-
-    try {
-        String sql = "SELECT * FROM jabatan ORDER BY id_jabatan ASC";
-        Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(sql);
-        ResultSet rs = pst.executeQuery();
-
-        while (rs.next()) {
-            model.addRow(new Object[]{
-                rs.getString("id_jabatan"),
-                rs.getString("nama_jabatan"),
-                formatRupiah(rs.getString("gaji_pokok")), 
-                rs.getString("kode_jabatan")
-            });
-        }
-        tblKaryawan.setModel(model);
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal menampilkan data: " + e.getMessage());
-    }
-}
-
-private void simpanData() {
-    String namaJabatan = txtNamaJabatan.getText().trim();
-    String gaji = txtGaji.getText().trim();
-    String keterangan = txtKeterangan.getText().trim();
-
-    if (namaJabatan.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Nama jabatan wajib diisi.");
-        return;
-    }
-
-    try {
-        String kodeJabatan = "JBT" + System.currentTimeMillis() % 10000;
-        String sql = "INSERT INTO jabatan (kode_jabatan, nama_jabatan, gaji_pokok) VALUES (?, ?, ?)";
-        Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setString(1, kodeJabatan);
-        pst.setString(2, namaJabatan);
-        pst.setDouble(3, gaji.isEmpty() ? 0 : Double.parseDouble(gaji));
-        pst.executeUpdate();
-
-        JOptionPane.showMessageDialog(this, "Data jabatan berhasil disimpan.");
+        initComponents();
+        styleButton();
         tampilData();
         resetForm();
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal menyimpan: " + e.getMessage());
-    }
-}
+        util.DesignUtil.applyPage(this);
 
-private void ubahData() {
-    String idJabatan = txtIdJabatan.getText().trim();
-    String namaJabatan = txtNamaJabatan.getText().trim();
-    String gaji = txtGaji.getText().trim();
-    String keterangan = txtKeterangan.getText().trim();
+        tblKaryawan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ambilDataDariTabel();
+            }
+        });
 
-    if (idJabatan.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Pilih data dari tabel dulu.");
-        return;
-    }
-
-    try {
-        String sql = "UPDATE jabatan SET nama_jabatan=?, gaji_pokok=? WHERE id_jabatan=?";
-        Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setString(1, namaJabatan);
-        pst.setDouble(2, gaji.isEmpty() ? 0 : Double.parseDouble(gaji));
-        pst.setString(3, idJabatan);
-        pst.executeUpdate();
-
-        JOptionPane.showMessageDialog(this, "Data jabatan berhasil diubah.");
-        tampilData();
-        resetForm();
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal mengubah: " + e.getMessage());
-    }
-}
-
-private void hapusData() {
-    String idJabatan = txtIdJabatan.getText().trim();
-
-    if (idJabatan.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Pilih data dari tabel dulu.");
-        return;
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tampilData();
+                resetForm();
+            }
+        });
     }
 
-    int konfirmasi = JOptionPane.showConfirmDialog(this,
-        "Yakin ingin menghapus jabatan ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+    private void styleButton() {
+        styleFilledButton(btnSimpan, new java.awt.Color(20, 184, 166), java.awt.Color.WHITE);
+        styleFilledButton(btnUbah, new java.awt.Color(37, 99, 235), java.awt.Color.WHITE);
+        styleFilledButton(btnHapus, new java.awt.Color(239, 68, 68), java.awt.Color.WHITE);
+        styleFilledButton(btnReset, new java.awt.Color(243, 244, 246), new java.awt.Color(17, 24, 39));
+    }
 
-    if (konfirmasi == JOptionPane.YES_OPTION) {
+    private void styleFilledButton(javax.swing.JButton button, java.awt.Color bg, java.awt.Color fg) {
+        button.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setOpaque(true);
+        button.setContentAreaFilled(true);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+    }
+
+    // ✅ FIX: ganti kode_jabatan -> keterangan
+    private void tampilData() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Jabatan");
+        model.addColumn("Nama Jabatan");
+        model.addColumn("Gaji Pokok");
+        model.addColumn("Keterangan");
+
         try {
-            String sql = "DELETE FROM jabatan WHERE id_jabatan=?";
+            String sql = "SELECT * FROM jabatan ORDER BY id_jabatan ASC";
             Connection conn = Koneksi.getConnection();
             PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, idJabatan);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("id_jabatan"),
+                    rs.getString("nama_jabatan"),
+                    formatRupiah(rs.getString("gaji_pokok")),
+                    rs.getString("keterangan") // ✅ FIX: was kode_jabatan
+                });
+            }
+            tblKaryawan.setModel(model);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal menampilkan data: " + e.getMessage());
+        }
+    }
+
+    // ✅ FIX: tambah keterangan di INSERT
+    private void simpanData() {
+        String namaJabatan = txtNamaJabatan.getText().trim();
+        String gaji = txtGaji.getText().trim();
+        String keterangan = txtKeterangan.getText().trim();
+
+        if (namaJabatan.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nama jabatan wajib diisi.");
+            return;
+        }
+
+        try {
+            String kodeJabatan = "JBT" + System.currentTimeMillis();
+            String sql = "INSERT INTO jabatan (kode_jabatan, nama_jabatan, gaji_pokok, keterangan) VALUES (?, ?, ?, ?)";
+            Connection conn = Koneksi.getConnection();
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, kodeJabatan);
+            pst.setString(2, namaJabatan);
+            pst.setDouble(3, gaji.isEmpty() ? 0 : Double.parseDouble(gaji));
+            pst.setString(4, keterangan); // ✅ FIX: tambah keterangan
             pst.executeUpdate();
 
-            JOptionPane.showMessageDialog(this, "Data jabatan berhasil dihapus.");
+            JOptionPane.showMessageDialog(this, "Data jabatan berhasil disimpan.");
             tampilData();
             resetForm();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Gagal menghapus: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Gagal menyimpan: " + e.getMessage());
         }
     }
-}
 
-private void resetForm() {
-    txtIdJabatan.setText("");
-    txtNamaJabatan.setText("");
-    txtGaji.setText("");
-    txtKeterangan.setText("");
-    txtIdJabatan.setEditable(false);
+    // ✅ FIX: tambah keterangan di UPDATE
+    private void ubahData() {
+        String idJabatan = txtIdJabatan.getText().trim();
+        String namaJabatan = txtNamaJabatan.getText().trim();
+        String gaji = txtGaji.getText().trim();
+        String keterangan = txtKeterangan.getText().trim();
 
-    btnSimpan.setEnabled(true);
-    btnUbah.setEnabled(false);
-    btnHapus.setEnabled(false);
-}
-
-private void ambilDataDariTabel() {
-    int baris = tblKaryawan.getSelectedRow();
-    if (baris >= 0) {
-        txtIdJabatan.setText(tblKaryawan.getValueAt(baris, 0).toString());
-        txtNamaJabatan.setText(tblKaryawan.getValueAt(baris, 1).toString());
-        txtGaji.setText(tblKaryawan.getValueAt(baris, 2).toString());
-        txtKeterangan.setText(tblKaryawan.getValueAt(baris, 3) != null ? 
-            tblKaryawan.getValueAt(baris, 3).toString() : "");
-
-        btnSimpan.setEnabled(false);
-        btnUbah.setEnabled(true);
-        btnHapus.setEnabled(true);
-    }
-}
-
-private void cariData() {
-    DefaultTableModel model = new DefaultTableModel();
-    model.addColumn("ID Jabatan");
-    model.addColumn("Nama Jabatan");
-    model.addColumn("Gaji Pokok");
-    model.addColumn("Keterangan");
-
-    String keyword = txtCari3.getText().trim();
-
-    try {
-        String sql = "SELECT * FROM jabatan "
-                + "WHERE nama_jabatan LIKE ? "
-                + "OR kode_jabatan LIKE ? "
-                + "ORDER BY id_jabatan ASC";
-
-        Connection conn = Koneksi.getConnection();
-        PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setString(1, "%" + keyword + "%");
-        pst.setString(2, "%" + keyword + "%");
-
-        ResultSet rs = pst.executeQuery();
-
-        while (rs.next()) {
-            model.addRow(new Object[]{
-                rs.getString("id_jabatan"),
-                rs.getString("nama_jabatan"),
-                rs.getString("gaji_pokok"),
-                rs.getString("kode_jabatan")
-            });
+        if (idJabatan.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pilih data dari tabel dulu.");
+            return;
         }
-        tblKaryawan.setModel(model);
 
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal mencari data: " + e.getMessage());
-    }
-}
+        try {
+            String sql = "UPDATE jabatan SET nama_jabatan=?, gaji_pokok=?, keterangan=? WHERE id_jabatan=?";
+            Connection conn = Koneksi.getConnection();
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, namaJabatan);
+            pst.setDouble(2, gaji.isEmpty() ? 0 : Double.parseDouble(gaji));
+            pst.setString(3, keterangan); // ✅ FIX: tambah keterangan
+            pst.setString(4, idJabatan);  // ✅ FIX: geser ke index 4
+            pst.executeUpdate();
 
-private String formatRupiah(String angka) {
-    try {
-        double nilai = Double.parseDouble(angka);
-        java.text.NumberFormat nf = java.text.NumberFormat.getInstance(new java.util.Locale("id", "ID"));
-        return "Rp " + nf.format(nilai);
-    } catch (Exception e) {
-        return angka;
+            JOptionPane.showMessageDialog(this, "Data jabatan berhasil diubah.");
+            tampilData();
+            resetForm();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal mengubah: " + e.getMessage());
+        }
     }
-}
+
+    private void hapusData() {
+        String idJabatan = txtIdJabatan.getText().trim();
+
+        if (idJabatan.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pilih data dari tabel dulu.");
+            return;
+        }
+
+        int konfirmasi = JOptionPane.showConfirmDialog(this,
+            "Yakin ingin menghapus jabatan ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+
+        if (konfirmasi == JOptionPane.YES_OPTION) {
+            try {
+                String sql = "DELETE FROM jabatan WHERE id_jabatan=?";
+                Connection conn = Koneksi.getConnection();
+                PreparedStatement pst = conn.prepareStatement(sql);
+                pst.setString(1, idJabatan);
+                pst.executeUpdate();
+
+                JOptionPane.showMessageDialog(this, "Data jabatan berhasil dihapus.");
+                tampilData();
+                resetForm();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Gagal menghapus: " + e.getMessage());
+            }
+        }
+    }
+
+    private void resetForm() {
+        txtIdJabatan.setText("");
+        txtNamaJabatan.setText("");
+        txtGaji.setText("");
+        txtKeterangan.setText("");
+        txtIdJabatan.setEditable(false);
+
+        btnSimpan.setEnabled(true);
+        btnUbah.setEnabled(false);
+        btnHapus.setEnabled(false);
+    }
+
+    // ✅ FIX: bersihkan format Rupiah sebelum isi txtGaji
+    private void ambilDataDariTabel() {
+        int baris = tblKaryawan.getSelectedRow();
+        if (baris >= 0) {
+            txtIdJabatan.setText(tblKaryawan.getValueAt(baris, 0).toString());
+            txtNamaJabatan.setText(tblKaryawan.getValueAt(baris, 1).toString());
+
+            String gajiRaw = tblKaryawan.getValueAt(baris, 2).toString()
+                .replace("Rp ", "")
+                .replace(".", "")
+                .replace(",", "")
+                .trim();
+            txtGaji.setText(gajiRaw); // ✅ FIX: angka bersih tanpa "Rp"
+
+            txtKeterangan.setText(tblKaryawan.getValueAt(baris, 3) != null ?
+                tblKaryawan.getValueAt(baris, 3).toString() : "");
+
+            btnSimpan.setEnabled(false);
+            btnUbah.setEnabled(true);
+            btnHapus.setEnabled(true);
+        }
+    }
+
+    // ✅ FIX: ganti kode_jabatan -> keterangan
+    private void cariData() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Jabatan");
+        model.addColumn("Nama Jabatan");
+        model.addColumn("Gaji Pokok");
+        model.addColumn("Keterangan");
+
+        String keyword = txtCari3.getText().trim();
+
+        try {
+            String sql = "SELECT * FROM jabatan "
+                    + "WHERE nama_jabatan LIKE ? "
+                    + "OR kode_jabatan LIKE ? "
+                    + "ORDER BY id_jabatan ASC";
+
+            Connection conn = Koneksi.getConnection();
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, "%" + keyword + "%");
+            pst.setString(2, "%" + keyword + "%");
+
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("id_jabatan"),
+                    rs.getString("nama_jabatan"),
+                    formatRupiah(rs.getString("gaji_pokok")),
+                    rs.getString("keterangan") // ✅ FIX: was kode_jabatan
+                });
+            }
+            tblKaryawan.setModel(model);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal mencari data: " + e.getMessage());
+        }
+    }
+
+    private String formatRupiah(String angka) {
+        try {
+            double nilai = Double.parseDouble(angka);
+            java.text.NumberFormat nf = java.text.NumberFormat.getInstance(new java.util.Locale("id", "ID"));
+            return "Rp " + nf.format(nilai);
+        } catch (Exception e) {
+            return angka;
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
