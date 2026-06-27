@@ -136,42 +136,32 @@ private boolean isTanggalValid(Date tanggalAwal, Date tanggalAkhir) {
 
 private void loadAbsensiData(boolean useFilter) {
     DefaultTableModel model = createTableModel();
-
     try {
         Date tanggalAwal = useFilter ? getTanggalAwal() : null;
         Date tanggalAkhir = useFilter ? getTanggalAkhir() : null;
         if (!isTanggalValid(tanggalAwal, tanggalAkhir)) return;
 
-        // ✅ Ambil id karyawan dari session login
-        int idLoginKaryawan = util.Session.getIdKaryawan(); // sesuaikan
+        boolean isHRD = util.Session.isHRD(); // ✅ cek role
 
         StringBuilder sql = new StringBuilder(
             "SELECT a.id_absensi, k.nama_karyawan, a.tanggal, "
             + "a.jam_masuk, a.jam_pulang, a.status, a.keterangan "
             + "FROM absensi a "
-            + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan "
-            + "WHERE a.id_karyawan = ? " // ✅ selalu filter by login user
+            + "JOIN karyawan k ON a.id_karyawan = k.id_karyawan WHERE 1=1 "
         );
         List<Object> params = new ArrayList<>();
-        params.add(idLoginKaryawan); // ✅ tambahkan di index pertama
+
+        if (!isHRD) { // ✅ hanya filter by user kalau bukan HRD
+            sql.append("AND a.id_karyawan = ? ");
+            params.add(util.Session.getIdKaryawan());
+        }
 
         if (useFilter) {
-            // hapus getSelectedIdKaryawan() karena sudah dikunci
             String status = getSelectedStatus();
             String keyword = txtCari.getText().trim();
-
-            if (tanggalAwal != null) {
-                sql.append("AND a.tanggal >= ? ");
-                params.add(tanggalAwal);
-            }
-            if (tanggalAkhir != null) {
-                sql.append("AND a.tanggal <= ? ");
-                params.add(tanggalAkhir);
-            }
-            if (status != null) {
-                sql.append("AND a.status = ? ");
-                params.add(status);
-            }
+            if (tanggalAwal != null) { sql.append("AND a.tanggal >= ? "); params.add(tanggalAwal); }
+            if (tanggalAkhir != null) { sql.append("AND a.tanggal <= ? "); params.add(tanggalAkhir); }
+            if (status != null) { sql.append("AND a.status = ? "); params.add(status); }
             if (!keyword.isEmpty()) {
                 sql.append("AND (a.tanggal LIKE ? OR a.status LIKE ? OR COALESCE(a.keterangan,'') LIKE ?) ");
                 String like = "%" + keyword + "%";
@@ -180,20 +170,15 @@ private void loadAbsensiData(boolean useFilter) {
         }
 
         sql.append("ORDER BY a.tanggal DESC");
-
         Connection conn = Koneksi.getConnection();
         PreparedStatement pst = conn.prepareStatement(sql.toString());
         for (int i = 0; i < params.size(); i++) pst.setObject(i + 1, params.get(i));
-
         ResultSet rs = pst.executeQuery();
         int no = 1;
         while (rs.next()) {
             model.addRow(new Object[]{
-                no++,
-                rs.getString("nama_karyawan"),
-                rs.getString("tanggal"),
-                rs.getString("jam_masuk"),
-                rs.getString("jam_pulang"),
+                no++, rs.getString("nama_karyawan"), rs.getString("tanggal"),
+                rs.getString("jam_masuk"), rs.getString("jam_pulang"),
                 rs.getString("status"),
                 rs.getString("keterangan") != null ? rs.getString("keterangan") : ""
             });

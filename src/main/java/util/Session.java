@@ -28,4 +28,12 @@ public class Session {
     public static String getRole() {
         return role;
     }
+    
+    public static boolean isHRD() {
+        return "HRD".equalsIgnoreCase(role);
+    }
+
+    public static String getNama() {
+        return namaKaryawan;
+    }
 }

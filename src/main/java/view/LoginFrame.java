@@ -231,7 +231,7 @@ public class LoginFrame extends JFrame {
         return right;
     }
 
-    private void prosesLogin() {
+private void prosesLogin() {
     String username = txtUsername.getText().trim();
     String password = new String(txtPassword.getPassword());
 
@@ -240,14 +240,12 @@ public class LoginFrame extends JFrame {
         return;
     }
 
-    // ✅ Ganti dari LoginService.login() ke query langsung agar bisa set Session
     try {
-        config.Koneksi.getConnection(); // pastikan koneksi ok
         java.sql.Connection conn = config.Koneksi.getConnection();
         java.sql.PreparedStatement pst = conn.prepareStatement(
-            "SELECT u.*, k.id_karyawan, k.nama_karyawan " +
+            "SELECT u.*, k.nama_karyawan " +
             "FROM users u " +
-            "JOIN karyawan k ON u.id_karyawan = k.id_karyawan " +
+            "LEFT JOIN karyawan k ON u.id_karyawan = k.id_karyawan " +
             "WHERE u.username = ? AND u.password = ?"
         );
         pst.setString(1, username);
@@ -256,10 +254,12 @@ public class LoginFrame extends JFrame {
 
         if (rs.next()) {
             String role = rs.getString("role");
-            int idKaryawan = rs.getInt("id_karyawan");
+            int idKaryawan = rs.getInt("id_karyawan"); // 0 jika NULL (HRD)
             String namaKaryawan = rs.getString("nama_karyawan");
+            if (namaKaryawan == null || namaKaryawan.trim().isEmpty()) {
+                namaKaryawan = "HRD Utama";
+            }
 
-            // ✅ Set session
             util.Session.login(idKaryawan, namaKaryawan, role);
 
             dispose();

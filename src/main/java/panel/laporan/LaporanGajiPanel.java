@@ -94,16 +94,17 @@ private void tampilData() {
     model.addColumn("Total Gaji");
 
     try {
-        int idLogin = util.Session.getIdKaryawan(); // ✅
+        boolean isHRD = util.Session.isHRD();
 
         String sql = "SELECT p.*, k.nama_karyawan FROM penggajian p "
                 + "JOIN karyawan k ON p.id_karyawan = k.id_karyawan "
-                + "WHERE p.id_karyawan = ? " // ✅ filter by login user
+                + (isHRD ? "" : "WHERE p.id_karyawan = ? ")
                 + "ORDER BY p.id_penggajian DESC";
 
         Connection conn = Koneksi.getConnection();
         PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setInt(1, idLogin); // ✅
+        if (!isHRD) pst.setInt(1, util.Session.getIdKaryawan());
+
         ResultSet rs = pst.executeQuery();
         int no = 1;
         while (rs.next()) {
