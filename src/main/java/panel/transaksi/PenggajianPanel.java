@@ -97,6 +97,46 @@ private void loadBulan() {
     txtTahun.setText(String.valueOf(LocalDate.now().getYear()));
 }
 
+private String getNamaBulan(String angka) {
+    String[] bulan = {"", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                      "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+    try {
+        int index = Integer.parseInt(angka);
+        if (index >= 1 && index <= 12) {
+            return bulan[index];
+        }
+    } catch (Exception ignored) {
+    }
+    return angka;
+}
+
+private String getBulanDariPeriode(String periode) {
+    if (periode == null || !periode.contains("-")) {
+        return "";
+    }
+    return getNamaBulan(periode.split("-")[1]);
+}
+
+private String getTahunDariPeriode(String periode) {
+    if (periode == null || !periode.contains("-")) {
+        return "";
+    }
+    return periode.split("-")[0];
+}
+
+private void rapikanTabelPenggajian() {
+    util.DesignUtil.applyTable(tblPenggajian);
+    tblPenggajian.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+    jScrollPane1.getViewport().setBackground(java.awt.Color.WHITE);
+    jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+    int[] widths = {72, 150, 92, 72, 130, 130, 130, 140, 180};
+    for (int i = 0; i < widths.length && i < tblPenggajian.getColumnModel().getColumnCount(); i++) {
+        tblPenggajian.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
+    }
+}
+
 private void autoFillGaji() {
     try {
         String selected = cmbKaryawan.getSelectedItem().toString();
@@ -142,7 +182,7 @@ private void hitungTotal() {
 }
 
 private void tampilData() {
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = util.TableUtil.nonEditableModel();
     model.addColumn("ID Gaji");
     model.addColumn("Karyawan");
     model.addColumn("Bulan");
@@ -165,8 +205,8 @@ private void tampilData() {
             model.addRow(new Object[]{
                 rs.getString("id_penggajian"),
                 rs.getString("nama_karyawan"),
-                rs.getString("periode").split("-")[1],
-                rs.getString("periode").split("-")[0],
+                getBulanDariPeriode(rs.getString("periode")),
+                getTahunDariPeriode(rs.getString("periode")),
                 formatRupiah(rs.getString("gaji_pokok")),
                 formatRupiah(rs.getString("total_tunjangan")),
                 formatRupiah(rs.getString("potongan")),
@@ -175,6 +215,7 @@ private void tampilData() {
             });
         }
         tblPenggajian.setModel(model);
+        rapikanTabelPenggajian();
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal tampil data: " + e.getMessage());
     }
@@ -368,7 +409,6 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
         lblTotalGaji = new javax.swing.JLabel();
         txtTotalGaji = new javax.swing.JTextField();
         lblKeterangan = new javax.swing.JLabel();
-        txtKeterangan = new javax.swing.JTextField();
         lblCari = new javax.swing.JLabel();
         txtCari = new javax.swing.JTextField();
         btnCari = new javax.swing.JButton();
@@ -380,6 +420,7 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
         btnReset = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
         btnCetakSlip = new javax.swing.JButton();
+        txtKeterangan = new javax.swing.JTextField();
         lblTitle = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblPenggajian = new javax.swing.JTable();
@@ -464,14 +505,6 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
 
         lblKeterangan.setText("Keterangan");
 
-        txtKeterangan.setAlignmentX(140.0F);
-        txtKeterangan.setAlignmentY(340.0F);
-        txtKeterangan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtKeteranganActionPerformed(evt);
-            }
-        });
-
         lblCari.setText("Cari");
 
         btnCari.setText("Cari");
@@ -541,6 +574,14 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
                 .addComponent(btnCetakSlip))
         );
 
+        txtKeterangan.setAlignmentX(140.0F);
+        txtKeterangan.setAlignmentY(340.0F);
+        txtKeterangan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtKeteranganActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlFormLayout = new javax.swing.GroupLayout(pnlForm);
         pnlForm.setLayout(pnlFormLayout);
         pnlFormLayout.setHorizontalGroup(
@@ -548,69 +589,74 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
             .addGroup(pnlFormLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblIdGaji, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createSequentialGroup()
+                        .addComponent(lblPotongan)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtPotongan, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createSequentialGroup()
+                        .addComponent(lblTotalGaji)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtTotalGaji, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createSequentialGroup()
+                            .addComponent(lblTunjangan)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(txtTunjangan))
+                        .addGroup(pnlFormLayout.createSequentialGroup()
+                            .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblKaryawan)
+                                .addComponent(lblBulan)
+                                .addComponent(lblTahun))
+                            .addGap(18, 18, 18)
+                            .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(pnlFormLayout.createSequentialGroup()
+                                    .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(txtIdGaji)
+                                        .addComponent(cmbKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGap(0, 0, Short.MAX_VALUE))
+                                .addComponent(cmbBulan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtTahun)))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createSequentialGroup()
+                            .addComponent(lblGajiPokok)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlFormLayout.createSequentialGroup()
-                        .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblIdGaji, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createSequentialGroup()
-                                .addComponent(lblKeterangan)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtKeterangan, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(41, 41, 41))
                     .addGroup(pnlFormLayout.createSequentialGroup()
                         .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlFormLayout.createSequentialGroup()
-                                .addComponent(lblPotongan)
                                 .addGap(18, 18, 18)
-                                .addComponent(txtPotongan, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lblKeterangan)
+                                .addGap(5, 5, 5)
+                                .addComponent(txtKeterangan, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(pnlFormLayout.createSequentialGroup()
-                                .addComponent(lblTotalGaji)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtTotalGaji, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createSequentialGroup()
-                                    .addComponent(lblTunjangan)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(txtTunjangan))
-                                .addGroup(pnlFormLayout.createSequentialGroup()
-                                    .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblKaryawan)
-                                        .addComponent(lblBulan)
-                                        .addComponent(lblTahun))
-                                    .addGap(18, 18, 18)
-                                    .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(pnlFormLayout.createSequentialGroup()
-                                            .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                .addComponent(txtIdGaji)
-                                                .addComponent(cmbKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGap(0, 0, Short.MAX_VALUE))
-                                        .addComponent(cmbBulan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(txtTahun)))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlFormLayout.createSequentialGroup()
-                                    .addComponent(lblGajiPokok)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(pnlFormLayout.createSequentialGroup()
-                        .addComponent(lblCari, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnCari)))
-                .addGap(25, 25, 25))
+                                .addGap(29, 29, 29)
+                                .addComponent(lblCari, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(29, 29, 29)
+                                .addComponent(btnCari)))
+                        .addContainerGap(96, Short.MAX_VALUE))))
         );
         pnlFormLayout.setVerticalGroup(
             pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlFormLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(25, 25, 25)
+                .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtKeterangan, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblKeterangan))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblCari)
                     .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCari)
-                    .addComponent(lblCari))
-                .addGap(50, 50, 50))
+                    .addComponent(btnCari))
+                .addGap(38, 38, 38)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(91, 91, 91))
             .addGroup(pnlFormLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -644,11 +690,7 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
                 .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblTotalGaji)
                     .addComponent(txtTotalGaji, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtKeterangan, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblKeterangan))
-                .addContainerGap(58, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         lblTitle.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -746,7 +788,7 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
 
     private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariActionPerformed
         String keyword = txtCari.getText().trim();
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = util.TableUtil.nonEditableModel();
     model.addColumn("ID Gaji");
     model.addColumn("Karyawan");
     model.addColumn("Bulan");
@@ -772,8 +814,8 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
             model.addRow(new Object[]{
                 rs.getString("id_penggajian"),
                 rs.getString("nama_karyawan"),
-                rs.getString("periode").split("-")[1],
-                rs.getString("periode").split("-")[0],
+                getBulanDariPeriode(rs.getString("periode")),
+                getTahunDariPeriode(rs.getString("periode")),
                 formatRupiah(rs.getString("gaji_pokok")),
                 formatRupiah(rs.getString("total_tunjangan")),
                 formatRupiah(rs.getString("potongan")),
@@ -782,6 +824,7 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
             });
         }
         tblPenggajian.setModel(model);
+        rapikanTabelPenggajian();
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal cari: " + e.getMessage());
     }

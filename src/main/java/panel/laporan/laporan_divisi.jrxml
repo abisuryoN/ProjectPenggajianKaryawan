@@ -1,125 +1,136 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="laporan_divisi" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b011529d-85c2-4d6f-bf87-1a78ce35670f">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Koneksi DB Penggajian"/>
-	<style name="Base" forecolor="#000000" fontName="SansSerif" fontSize="9"/>
-	<style name="Title" style="Base" fontSize="16" isBold="true"/>
-	<style name="Header" style="Base" isBold="true"/>
-	<queryString language="SQL">
-		<![CDATA[SELECT d.id_divisi, d.nama_divisi, COALESCE(d.kepala_divisi, '') AS kepala_divisi, d.keterangan, COUNT(k.id_karyawan) AS jumlah_karyawan
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="laporan_divisi" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="b011529d-85c2-4d6f-bf87-1a78ce35670f">
+    <queryString language="SQL">
+        <![CDATA[SELECT d.id_divisi, d.nama_divisi,
+       COALESCE(d.kepala_divisi, '') AS kepala_divisi,
+       COALESCE(d.keterangan, '') AS keterangan,
+       COUNT(k.id_karyawan) AS jumlah_karyawan
 FROM divisi d
 LEFT JOIN karyawan k ON k.id_divisi = d.id_divisi
 GROUP BY d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan
 ORDER BY d.id_divisi ASC]]>
-	</queryString>
-	<field name="id_divisi" class="java.lang.Integer"/>
-	<field name="nama_divisi" class="java.lang.String"/>
-	<field name="kepala_divisi" class="java.lang.String"/>
-	<field name="jumlah_karyawan" class="java.lang.Long"/>
-	<field name="keterangan" class="java.lang.String"/>
-	<title>
-		<band height="48">
-			<staticText>
-				<reportElement style="Title" x="0" y="0" width="802" height="24" uuid="f9af8c94-081c-473f-a616-8f8ab7f824e0"/>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[LAPORAN DATA DIVISI]]></text>
-			</staticText>
-			<line>
-				<reportElement x="0" y="36" width="802" height="1" uuid="c1053724-7213-4ea7-bc21-51c4c34c5b87"/>
-			</line>
-		</band>
-	</title>
-	<columnHeader>
-		<band height="24">
-			<staticText>
-				<reportElement style="Header" x="0" y="0" width="40" height="24" uuid="0e5c902d-44fe-47a4-95c7-28893d031b9d"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<text><![CDATA[No]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Header" x="40" y="0" width="90" height="24" uuid="22a15d74-ad77-4acf-929b-f536364059d6"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<text><![CDATA[ID Divisi]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Header" x="130" y="0" width="210" height="24" uuid="fa2c2064-1692-4b5f-9704-0c086630ddf1"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<text><![CDATA[Nama Divisi]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Header" x="340" y="0" width="170" height="24" uuid="ae528f4f-b6d9-43c9-86a8-24de2867b9a9"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<text><![CDATA[Kepala Divisi]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Header" x="510" y="0" width="120" height="24" uuid="85be3673-b3ca-49f4-8d74-5f6cca5022af"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<text><![CDATA[Jumlah Karyawan]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Header" x="630" y="0" width="172" height="24" uuid="c3929d9e-b054-4f43-b9cd-1ec793b2fa37"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<text><![CDATA[Keterangan]]></text>
-			</staticText>
-		</band>
-	</columnHeader>
-	<detail>
-		<band height="22">
-			<textField>
-				<reportElement style="Base" x="0" y="0" width="40" height="22" uuid="6a61b112-48b1-4702-ac4a-409dd84317cb"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement style="Base" x="40" y="0" width="90" height="22" uuid="313f8d06-40fd-4c00-a4b8-bdd591d89b97"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<textFieldExpression><![CDATA[$F{id_divisi}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement style="Base" x="130" y="0" width="210" height="22" uuid="f7a38dcd-f07e-4991-96ce-92b7ad9d8993"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<textFieldExpression><![CDATA[$F{nama_divisi}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement style="Base" x="340" y="0" width="170" height="22" uuid="04995993-d62d-433e-af8b-b88c56d29514"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<textFieldExpression><![CDATA[$F{kepala_divisi}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement style="Base" x="510" y="0" width="120" height="22" uuid="80c1ed08-3a80-446f-a7a2-62add36d6f7e"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center"/>
-				<textFieldExpression><![CDATA[$F{jumlah_karyawan}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement style="Base" x="630" y="0" width="172" height="22" uuid="c52b2184-dc62-47bd-a4bc-587eb95a8771"/>
-				<box>
-					<pen lineWidth="0.5"/>
-				</box>
-				<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
-			</textField>
-		</band>
-	</detail>
+    </queryString>
+    <field name="id_divisi" class="java.lang.Integer"/>
+    <field name="nama_divisi" class="java.lang.String"/>
+    <field name="kepala_divisi" class="java.lang.String"/>
+    <field name="jumlah_karyawan" class="java.lang.Long"/>
+    <field name="keterangan" class="java.lang.String"/>
+    <title>
+        <band height="90">
+            <staticText>
+                <reportElement x="0" y="2" width="802" height="22" uuid="a0c8c242-adc4-45fe-b88a-08dabc45915b"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
+                <text><![CDATA[SISTEM PENGGAJIAN KARYAWAN]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="24" width="802" height="16" uuid="f2af8fde-f4aa-4d71-b5dd-913c0d210d41"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="9"/></textElement>
+                <text><![CDATA[Jl. Raya Perusahaan No. 01, Jakarta | Telp. (021) 000000 | Email: hrd@perusahaan.com]]></text>
+            </staticText>
+            <line>
+                <reportElement x="0" y="46" width="802" height="1" uuid="58e31d42-60af-4b8b-96b0-833a6d30dfda"/>
+                <graphicElement><pen lineWidth="2.0" lineStyle="Solid"/></graphicElement>
+            </line>
+            <line>
+                <reportElement x="0" y="50" width="802" height="1" uuid="0ff44b2d-6887-40e1-8b3f-99dcffa25f1d"/>
+                <graphicElement><pen lineWidth="0.5" lineStyle="Solid"/></graphicElement>
+            </line>
+            <staticText>
+                <reportElement x="0" y="60" width="802" height="22" uuid="3045b0a3-dff6-4c81-a5d3-72ff8a849241"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
+                <text><![CDATA[LAPORAN DATA DIVISI]]></text>
+            </staticText>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="40" height="20" uuid="bb2bb9ae-6efd-45e2-819e-a0a5fcc2d1eb"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[No]]></text></staticText>
+
+            <staticText><reportElement x="40" y="0" width="90" height="20" uuid="79d9dc93-e015-4e2b-9785-d2d9205e4112"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[ID Divisi]]></text></staticText>
+
+            <staticText><reportElement x="130" y="0" width="210" height="20" uuid="12bb4645-4f94-4a26-ba5e-b8bb11b06c6a"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Nama Divisi]]></text></staticText>
+
+            <staticText><reportElement x="340" y="0" width="170" height="20" uuid="4dc0e094-de53-48fd-82a2-ef2e6f93510f"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Kepala Divisi]]></text></staticText>
+
+            <staticText><reportElement x="510" y="0" width="120" height="20" uuid="4f787ee1-7109-4f79-a870-8757fddc9ad9"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Jumlah Karyawan]]></text></staticText>
+
+            <staticText><reportElement x="630" y="0" width="172" height="20" uuid="1af78556-1981-4315-9501-dff7f19d6eb3"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Keterangan]]></text></staticText>
+
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="18">
+            <textField><reportElement x="0" y="0" width="40" height="18" uuid="10cba0ca-c677-4854-b04f-e280892bfdfd"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="40" y="0" width="90" height="18" uuid="0956e035-1be0-40df-b63f-97a2b2caf656"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{id_divisi}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="130" y="0" width="210" height="18" uuid="62744b81-2ad9-4474-91a1-2a8ca19642d5"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{nama_divisi}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="340" y="0" width="170" height="18" uuid="9a93bf9b-e6be-48a5-b9ea-e5525fffb699"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{kepala_divisi}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="510" y="0" width="120" height="18" uuid="f3f232cd-47d4-4a7a-8bbc-e367ed914a0e"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{jumlah_karyawan}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="630" y="0" width="172" height="18" uuid="9bb86462-5bae-4676-82f9-98dd8872c8da"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression></textField>
+
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="300" height="18" uuid="41ea34a1-e9d1-4d96-84e6-8da10ea09a53"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="602" y="0" width="150" height="18" uuid="6b1bcae5-4f75-4444-80c9-bb0dde7452bc"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER} + " dari "]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="752" y="0" width="50" height="18" uuid="916c0528-658d-4c77-b590-5e8fbfa6cdd3"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="110">
+            <staticText>
+                <reportElement x="40" y="10" width="180" height="16" uuid="8c24628e-ae55-4ae2-84b8-1960a31d8beb"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[Mengetahui,]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="40" y="26" width="180" height="16" uuid="6529c73c-952a-4208-968d-889e47de3de3"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement>
+                <text><![CDATA[HRD]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="40" y="72" width="180" height="16" uuid="13a63e75-5caf-41c4-aa61-458c28e94e9f"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[( _________________________ )]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="552" y="10" width="200" height="16" uuid="d3c4e5e6-e335-4516-bdb0-a9a01ec6b2a3"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[Menyetujui,]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="552" y="26" width="200" height="16" uuid="76d317e0-fc78-4183-8140-31bb2c18596b"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement>
+                <text><![CDATA[Direktur / Pimpinan]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="552" y="72" width="200" height="16" uuid="ecd2e796-3a28-4f9f-9a89-a8c35adc70dd"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[( _________________________ )]]></text>
+            </staticText>
+        </band>
+    </summary>
 </jasperReport>
+

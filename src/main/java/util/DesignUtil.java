@@ -15,9 +15,12 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.JTableHeader;
 
 public final class DesignUtil {
@@ -35,6 +38,7 @@ public final class DesignUtil {
         panel.setBackground(PAGE_BG);
         panel.setPreferredSize(new Dimension(1120, 660));
         panel.setMinimumSize(new Dimension(900, 560));
+        panel.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
         applyComponent(panel);
     }
 
@@ -54,6 +58,8 @@ public final class DesignUtil {
                         border.getTitleFont(),
                         border.getTitleColor()
                 ));
+            } else if (panel.getParent() != null) {
+                panel.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
             }
         } else if (component instanceof JLabel) {
             styleLabel((JLabel) component);
@@ -62,7 +68,10 @@ public final class DesignUtil {
         } else if (component instanceof JTable) {
             styleTable((JTable) component);
         } else if (component instanceof JScrollPane) {
-            ((JScrollPane) component).setBorder(BorderFactory.createLineBorder(LINE));
+            JScrollPane scrollPane = (JScrollPane) component;
+            scrollPane.setBorder(BorderFactory.createLineBorder(LINE));
+            scrollPane.getViewport().setBackground(Color.WHITE);
+            scrollPane.setBackground(Color.WHITE);
         } else if (component instanceof JTextField) {
             styleInput((JTextField) component);
         } else if (component instanceof JTextArea) {
@@ -70,6 +79,8 @@ public final class DesignUtil {
         } else if (component instanceof JComboBox) {
             component.setFont(new Font("Segoe UI", Font.PLAIN, 13));
             component.setForeground(TEXT);
+            ((JComboBox) component).setPreferredSize(new Dimension(
+                    Math.max(140, component.getPreferredSize().width), 32));
         }
 
         if (component instanceof java.awt.Container) {
@@ -103,7 +114,8 @@ public final class DesignUtil {
         button.setFocusPainted(false);
         button.setFont(new Font("Segoe UI", Font.BOLD, 13));
         button.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
-        button.setPreferredSize(new Dimension(Math.max(86, button.getPreferredSize().width), 36));
+        button.setPreferredSize(new Dimension(Math.max(92, button.getPreferredSize().width), 36));
+        button.setMinimumSize(new Dimension(92, 34));
     }
 
     private static String cleanButtonText(String text) {
@@ -113,7 +125,7 @@ public final class DesignUtil {
         if (text.contains("Cari")) return "Cari";
         if (text.contains("Cetak Slip")) return "Cetak Slip";
         if (text.contains("Cetak")) return "Cetak";
-        if (text.contains("Export PDF")) return "Export PDF";
+        if (text.contains("Export")) return "Export PDF";
         if (text.contains("Refresh")) return "Refresh";
         if (text.contains("Reset")) return "Reset";
         return text;
@@ -124,33 +136,74 @@ public final class DesignUtil {
     }
 
     public static void applyTable(JTable table) {
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.setForeground(TEXT);
-        table.setRowHeight(28);
+        table.setRowHeight(23);
         table.setGridColor(LINE);
         table.setShowHorizontalLines(true);
         table.setShowVerticalLines(true);
         table.setFillsViewportHeight(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setIntercellSpacing(new Dimension(1, 1));
+        table.setAutoCreateRowSorter(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        table.setBackground(Color.WHITE);
+        table.setDefaultRenderer(Object.class, new CellRenderer());
+        table.setDefaultEditor(Object.class, null);
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        table.setPreferredScrollableViewportSize(new Dimension(900, table.getRowHeight() * 10 + 28));
+        if (!Boolean.TRUE.equals(table.getClientProperty("compactTableListenerInstalled"))) {
+            table.addPropertyChangeListener("model", evt -> compactColumns(table));
+            table.putClientProperty("compactTableListenerInstalled", Boolean.TRUE);
+        }
+        compactColumns(table);
 
         JTableHeader header = table.getTableHeader();
         if (header != null) {
-            header.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            header.setFont(new Font("Segoe UI", Font.BOLD, 12));
             header.setForeground(Color.WHITE);
             header.setBackground(PRIMARY);
             header.setOpaque(true);
             header.setReorderingAllowed(false);
-            header.setPreferredSize(new Dimension(header.getPreferredSize().width, 32));
+            header.setPreferredSize(new Dimension(header.getPreferredSize().width, 27));
             header.setDefaultRenderer(new HeaderRenderer());
+        }
+    }
+
+    public static void compactColumns(JTable table) {
+        if (table.getColumnCount() == 0 || table.getColumnModel().getColumnCount() == 0) {
+            return;
+        }
+
+        TableColumnModel columnModel = table.getColumnModel();
+        int columnCount = Math.min(table.getColumnCount(), columnModel.getColumnCount());
+        for (int column = 0; column < columnCount; column++) {
+            int width = 44;
+            Object headerValue = columnModel.getColumn(column).getHeaderValue();
+            if (headerValue != null) {
+                width = Math.max(width, headerValue.toString().length() * 8 + 24);
+            }
+
+            int rows = Math.min(table.getModel().getRowCount(), 200);
+            for (int row = 0; row < rows; row++) {
+                Object value = table.getModel().getValueAt(row, column);
+                if (value != null) {
+                    width = Math.max(width, value.toString().length() * 7 + 26);
+                }
+            }
+
+            TableColumn tableColumn = columnModel.getColumn(column);
+            tableColumn.setPreferredWidth(Math.min(Math.max(width, 64), 240));
         }
     }
 
     private static final class HeaderRenderer extends DefaultTableCellRenderer {
         HeaderRenderer() {
-            setHorizontalAlignment(SwingConstants.LEFT);
+            setHorizontalAlignment(SwingConstants.CENTER);
             setOpaque(true);
             setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 0, 1, 1, new Color(60, 86, 124)),
-                    BorderFactory.createEmptyBorder(6, 8, 6, 8)
+                    BorderFactory.createEmptyBorder(6, 10, 6, 10)
             ));
         }
 
@@ -159,10 +212,58 @@ public final class DesignUtil {
                 boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setText(value == null ? "" : value.toString());
-            setFont(new Font("Segoe UI", Font.BOLD, 13));
+            setFont(new Font("Segoe UI", Font.BOLD, 12));
             setForeground(Color.WHITE);
             setBackground(PRIMARY);
             return this;
+        }
+    }
+
+    private static final class CellRenderer extends DefaultTableCellRenderer {
+        CellRenderer() {
+            setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+            if (isIdColumn(table, column)) {
+                setHorizontalAlignment(SwingConstants.CENTER);
+            } else if (isMoneyColumn(table, column)) {
+                setHorizontalAlignment(SwingConstants.RIGHT);
+            } else {
+                setHorizontalAlignment(SwingConstants.LEFT);
+            }
+            return this;
+        }
+
+        private boolean isIdColumn(JTable table, int column) {
+            String name = table.getColumnName(column);
+            if (name == null) {
+                return false;
+            }
+            String normalized = name.trim().toLowerCase();
+            return normalized.equals("id")
+                    || normalized.equals("no")
+                    || normalized.equals("no.")
+                    || normalized.startsWith("id ")
+                    || normalized.startsWith("id_");
+        }
+
+        private boolean isMoneyColumn(JTable table, int column) {
+            String name = table.getColumnName(column);
+            if (name == null) {
+                return false;
+            }
+            String normalized = name.trim().toLowerCase();
+            return normalized.contains("gaji")
+                    || normalized.contains("nominal")
+                    || normalized.contains("tunjangan")
+                    || normalized.contains("potongan")
+                    || normalized.contains("total");
         }
     }
 
@@ -170,6 +271,7 @@ public final class DesignUtil {
         input.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         input.setForeground(TEXT);
         input.setBackground(Color.WHITE);
+        input.setPreferredSize(new Dimension(Math.max(120, input.getPreferredSize().width), 32));
         input.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(190, 198, 208)),
                 BorderFactory.createEmptyBorder(4, 8, 4, 8)

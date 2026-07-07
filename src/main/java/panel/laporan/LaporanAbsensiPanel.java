@@ -95,7 +95,7 @@ private void setupDateChooser() {
 }
 
 private DefaultTableModel createTableModel() {
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = util.TableUtil.nonEditableModel();
     model.addColumn("NO");
     model.addColumn("Nama Karyawan");
     model.addColumn("Tanggal");
@@ -184,6 +184,7 @@ private void loadAbsensiData(boolean useFilter) {
             });
         }
         tblLaporanAbsensi.setModel(model);
+        util.DesignUtil.applyTable(tblLaporanAbsensi);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal tampil data: " + e.getMessage());
     }

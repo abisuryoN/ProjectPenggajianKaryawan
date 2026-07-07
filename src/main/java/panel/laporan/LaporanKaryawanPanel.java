@@ -1,8 +1,14 @@
 package panel.laporan;
 import config.Koneksi;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -14,6 +20,7 @@ public class LaporanKaryawanPanel extends javax.swing.JPanel {
 
     public LaporanKaryawanPanel() {
     initComponents();
+    rebuildLayout();
     styleButton();
     tampilData();
     util.DesignUtil.applyPage(this);
@@ -24,8 +31,51 @@ public class LaporanKaryawanPanel extends javax.swing.JPanel {
     btnExportPDF.addActionListener(e -> cetakLaporanJasper());
     btncetak.addActionListener(e -> cetakLaporanJasper());
     
-    // Biar bisa scroll kanan kiri
-    tblAbsensi.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+    tblAbsensi.setDefaultEditor(Object.class, null);
+    tblAbsensi.getTableHeader().setReorderingAllowed(false);
+}
+
+private void rebuildLayout() {
+    removeAll();
+    setLayout(new BorderLayout(0, 14));
+
+    JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
+    titlePanel.setOpaque(false);
+    titlePanel.add(jLabel1);
+
+    JPanel searchPanel = new JPanel(new BorderLayout(12, 0));
+    searchPanel.setBorder(BorderFactory.createTitledBorder("Filter Data"));
+    txtCari.setPreferredSize(new Dimension(280, 34));
+    searchPanel.add(jLabel9, BorderLayout.WEST);
+    searchPanel.add(txtCari, BorderLayout.CENTER);
+
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+    buttonPanel.setOpaque(false);
+    buttonPanel.add(btnCari);
+    buttonPanel.add(btnExportPDF);
+    buttonPanel.add(btncetak);
+    buttonPanel.add(btnReset);
+    buttonPanel.add(btnRefresh);
+
+    JPanel topPanel = new JPanel(new BorderLayout(16, 0));
+    topPanel.setOpaque(false);
+    topPanel.add(searchPanel, BorderLayout.CENTER);
+    topPanel.add(buttonPanel, BorderLayout.EAST);
+
+    jPanel2.setBorder(BorderFactory.createTitledBorder("Data Karyawan"));
+    jPanel2.removeAll();
+    jPanel2.setLayout(new BorderLayout());
+    jScrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    jScrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    jPanel2.add(jScrollPane1, BorderLayout.CENTER);
+
+    JPanel content = new JPanel(new BorderLayout(0, 12));
+    content.setOpaque(false);
+    content.add(topPanel, BorderLayout.NORTH);
+    content.add(jPanel2, BorderLayout.CENTER);
+
+    add(titlePanel, BorderLayout.NORTH);
+    add(content, BorderLayout.CENTER);
 }
     
     private void styleButton() {
@@ -47,7 +97,7 @@ private void styleFilledButton(javax.swing.JButton button, java.awt.Color bg, ja
 }
 
 private void tampilData() {
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = util.TableUtil.nonEditableModel();
     model.addColumn("ID");
     model.addColumn("NIK");
     model.addColumn("Nama Karyawan");
@@ -82,16 +132,7 @@ private void tampilData() {
             });
         }
         tblAbsensi.setModel(model);
-
-        // Set lebar kolom
-        tblAbsensi.getColumnModel().getColumn(0).setPreferredWidth(50);
-        tblAbsensi.getColumnModel().getColumn(1).setPreferredWidth(80);
-        tblAbsensi.getColumnModel().getColumn(2).setPreferredWidth(150);
-        tblAbsensi.getColumnModel().getColumn(3).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(4).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(5).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(6).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(7).setPreferredWidth(200);
+        util.DesignUtil.applyTable(tblAbsensi);
 
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal tampil data: " + e.getMessage());
@@ -100,7 +141,7 @@ private void tampilData() {
 
 private void cariData() {
     String keyword = txtCari.getText().trim();
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = util.TableUtil.nonEditableModel();
     model.addColumn("ID");
     model.addColumn("NIK");
     model.addColumn("Nama Karyawan");
@@ -141,15 +182,7 @@ private void cariData() {
             });
         }
         tblAbsensi.setModel(model);
-
-        tblAbsensi.getColumnModel().getColumn(0).setPreferredWidth(50);
-        tblAbsensi.getColumnModel().getColumn(1).setPreferredWidth(80);
-        tblAbsensi.getColumnModel().getColumn(2).setPreferredWidth(150);
-        tblAbsensi.getColumnModel().getColumn(3).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(4).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(5).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(6).setPreferredWidth(100);
-        tblAbsensi.getColumnModel().getColumn(7).setPreferredWidth(200);
+        util.DesignUtil.applyTable(tblAbsensi);
 
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal cari: " + e.getMessage());

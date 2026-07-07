@@ -118,6 +118,7 @@ private void tampilData() {
             });
         }
         tblKaryawan.setModel(model);
+        util.DesignUtil.applyTable(tblKaryawan);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal menampilkan data: " + e.getMessage());
     }
@@ -315,6 +316,7 @@ private void cariData() {
             });
         }
         tblKaryawan.setModel(model);
+        util.DesignUtil.applyTable(tblKaryawan);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal mencari: " + e.getMessage());
     }
@@ -449,7 +451,7 @@ private void ambilDataDariTabel() {
                     .addComponent(btnCari)
                     .addComponent(btnRefresh))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 

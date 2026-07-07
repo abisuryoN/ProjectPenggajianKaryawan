@@ -1,170 +1,172 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="slip_gaji" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="30" bottomMargin="30" uuid="1b4351de-e864-4d84-bc95-8f21e637d1b1">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Koneksi DB Penggajian"/>
-	<style name="Base" forecolor="#000000" fontName="SansSerif" fontSize="10"/>
-	<style name="Title" style="Base" fontSize="16" isBold="true"/>
-	<style name="Label" style="Base" isBold="true"/>
-	<style name="Total" style="Base" fontSize="12" isBold="true"/>
-	<parameter name="id_gaji" class="java.lang.Integer"/>
-	<queryString language="SQL">
-		<![CDATA[SELECT
-    p.id_penggajian,
-    k.nik,
-    k.nama_karyawan,
-    j.nama_jabatan,
-    d.nama_divisi,
-    p.periode,
-    CASE SUBSTRING(p.periode, 6, 2)
-        WHEN '01' THEN 'Januari'
-        WHEN '02' THEN 'Februari'
-        WHEN '03' THEN 'Maret'
-        WHEN '04' THEN 'April'
-        WHEN '05' THEN 'Mei'
-        WHEN '06' THEN 'Juni'
-        WHEN '07' THEN 'Juli'
-        WHEN '08' THEN 'Agustus'
-        WHEN '09' THEN 'September'
-        WHEN '10' THEN 'Oktober'
-        WHEN '11' THEN 'November'
-        WHEN '12' THEN 'Desember'
-        ELSE SUBSTRING(p.periode, 6, 2)
-    END AS bulan,
-    SUBSTRING(p.periode, 1, 4) AS tahun,
-    p.gaji_pokok,
-    p.total_tunjangan AS tunjangan,
-    p.potongan,
-    p.total_gaji,
-    p.tanggal_gaji,
-    '' AS keterangan
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="slip_gaji" pageWidth="595" pageHeight="842"
+              columnWidth="515" leftMargin="40" rightMargin="40" topMargin="30" bottomMargin="30"
+              uuid="1b4351de-e864-4d84-bc95-8f21e637d1b1">
+    <parameter name="id_gaji" class="java.lang.Integer"/>
+    <queryString language="SQL">
+        <![CDATA[SELECT p.id_penggajian, k.nik, k.nama_karyawan,
+       COALESCE(j.nama_jabatan,'') AS nama_jabatan,
+       COALESCE(d.nama_divisi,'') AS nama_divisi,
+       CASE SUBSTRING(p.periode, 6, 2)
+         WHEN '01' THEN 'Januari' WHEN '02' THEN 'Februari' WHEN '03' THEN 'Maret'
+         WHEN '04' THEN 'April'   WHEN '05' THEN 'Mei'      WHEN '06' THEN 'Juni'
+         WHEN '07' THEN 'Juli'    WHEN '08' THEN 'Agustus'  WHEN '09' THEN 'September'
+         WHEN '10' THEN 'Oktober' WHEN '11' THEN 'November' WHEN '12' THEN 'Desember'
+         ELSE SUBSTRING(p.periode, 6, 2)
+       END AS bulan,
+       SUBSTRING(p.periode, 1, 4) AS tahun,
+       p.gaji_pokok, p.total_tunjangan AS tunjangan, p.potongan, p.total_gaji,
+       p.tanggal_gaji
 FROM penggajian p
 JOIN karyawan k ON k.id_karyawan = p.id_karyawan
 LEFT JOIN jabatan j ON j.id_jabatan = k.id_jabatan
 LEFT JOIN divisi d ON d.id_divisi = k.id_divisi
 WHERE p.id_penggajian = $P{id_gaji}]]>
-	</queryString>
-	<field name="nik" class="java.lang.String"/>
-	<field name="nama_karyawan" class="java.lang.String"/>
-	<field name="nama_jabatan" class="java.lang.String"/>
-	<field name="nama_divisi" class="java.lang.String"/>
-	<field name="periode" class="java.lang.String"/>
-	<field name="bulan" class="java.lang.String"/>
-	<field name="tahun" class="java.lang.String"/>
-	<field name="gaji_pokok" class="java.math.BigDecimal"/>
-	<field name="tunjangan" class="java.math.BigDecimal"/>
-	<field name="potongan" class="java.math.BigDecimal"/>
-	<field name="total_gaji" class="java.math.BigDecimal"/>
-	<field name="tanggal_gaji" class="java.sql.Date"/>
-	<field name="keterangan" class="java.lang.String"/>
-	<title>
-		<band height="70">
-			<staticText>
-				<reportElement style="Title" x="0" y="0" width="515" height="25" uuid="77f938bb-03b1-47d3-970e-dce51a655e5e"/>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[SLIP GAJI KARYAWAN]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Base" x="0" y="28" width="515" height="18" uuid="9e223148-a7e4-4975-97c9-82dcbb1f4e4d"/>
-				<textElement textAlignment="Center"/>
-				<text><![CDATA[Sistem Penggajian Karyawan]]></text>
-			</staticText>
-			<line>
-				<reportElement x="0" y="56" width="515" height="1" uuid="a86eca80-41dc-41ce-bbd7-0b5da9263e9d"/>
-			</line>
-		</band>
-	</title>
-	<detail>
-		<band height="330">
-			<staticText>
-				<reportElement style="Label" x="0" y="0" width="120" height="18" uuid="a93ec104-989f-49e4-8722-286ecb1e5f09"/>
-				<text><![CDATA[NIK]]></text>
-			</staticText>
-			<textField>
-				<reportElement style="Base" x="135" y="0" width="360" height="18" uuid="5325476e-62a0-4c7b-924b-6708c69e8931"/>
-				<textFieldExpression><![CDATA[$F{nik}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="Label" x="0" y="24" width="120" height="18" uuid="e3941d3c-41e3-4747-bcb1-d6ab958ee0b4"/>
-				<text><![CDATA[Nama Karyawan]]></text>
-			</staticText>
-			<textField>
-				<reportElement style="Base" x="135" y="24" width="360" height="18" uuid="d3378ee7-6975-44ba-b5da-8b6910c523bf"/>
-				<textFieldExpression><![CDATA[$F{nama_karyawan}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="Label" x="0" y="48" width="120" height="18" uuid="b58b2db2-bc75-412a-b7d6-4a2988425a31"/>
-				<text><![CDATA[Jabatan]]></text>
-			</staticText>
-			<textField>
-				<reportElement style="Base" x="135" y="48" width="360" height="18" uuid="a5e9fbf3-0414-4ee9-b340-66b74b8f5065"/>
-				<textFieldExpression><![CDATA[$F{nama_jabatan}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="Label" x="0" y="72" width="120" height="18" uuid="d403062e-0920-4ae4-b1de-c52861e2687a"/>
-				<text><![CDATA[Divisi]]></text>
-			</staticText>
-			<textField>
-				<reportElement style="Base" x="135" y="72" width="360" height="18" uuid="c1e79efe-9edc-49e3-8f7d-c9b3471202a7"/>
-				<textFieldExpression><![CDATA[$F{nama_divisi}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="Label" x="0" y="96" width="120" height="18" uuid="e0b31b5c-5de5-475c-84fc-0dec3b6fef0e"/>
-				<text><![CDATA[Periode]]></text>
-			</staticText>
-			<textField>
-				<reportElement style="Base" x="135" y="96" width="360" height="18" uuid="6aa0dec8-6f3d-4a90-9307-6ea1422e9ca3"/>
-				<textFieldExpression><![CDATA[$F{bulan} + " " + $F{tahun}]]></textFieldExpression>
-			</textField>
-			<line>
-				<reportElement x="0" y="132" width="515" height="1" uuid="53100ce7-6f05-4658-9f95-7ad75696b239"/>
-			</line>
-			<staticText>
-				<reportElement style="Label" x="0" y="150" width="180" height="20" uuid="bd934918-0f6d-4588-8f0f-c59db038c7c1"/>
-				<text><![CDATA[Gaji Pokok]]></text>
-			</staticText>
-			<textField pattern="#,##0.00">
-				<reportElement style="Base" x="250" y="150" width="245" height="20" uuid="bb3b7fcb-1e8a-4c29-918f-f9c132820be4"/>
-				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA[$F{gaji_pokok}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="Label" x="0" y="176" width="180" height="20" uuid="b72629a7-430c-4281-b8cf-d2407bc8c241"/>
-				<text><![CDATA[Tunjangan]]></text>
-			</staticText>
-			<textField pattern="#,##0.00">
-				<reportElement style="Base" x="250" y="176" width="245" height="20" uuid="731e29f9-2684-4e1d-a9ef-ccedc90b7f45"/>
-				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA[$F{tunjangan}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="Label" x="0" y="202" width="180" height="20" uuid="239a02b1-a0d9-46bc-bfc5-0bb04a845b8d"/>
-				<text><![CDATA[Potongan]]></text>
-			</staticText>
-			<textField pattern="#,##0.00">
-				<reportElement style="Base" x="250" y="202" width="245" height="20" uuid="3076dd0c-fe8f-4849-ae5e-eb33e9095b4a"/>
-				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA[$F{potongan}]]></textFieldExpression>
-			</textField>
-			<line>
-				<reportElement x="0" y="232" width="515" height="1" uuid="b1824b86-f5d1-494a-951d-bf3a79c81242"/>
-			</line>
-			<staticText>
-				<reportElement style="Total" x="0" y="248" width="180" height="24" uuid="ce42809b-4927-41fc-85c6-682d9242e208"/>
-				<text><![CDATA[TOTAL GAJI]]></text>
-			</staticText>
-			<textField pattern="#,##0.00">
-				<reportElement style="Total" x="250" y="248" width="245" height="24" uuid="5f735a3e-f33f-4d73-aa35-94c90ba44dd4"/>
-				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA[$F{total_gaji}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement style="Label" x="0" y="292" width="120" height="18" uuid="42b585dd-f4b8-4534-a924-c9dfe50d99d7"/>
-				<text><![CDATA[Keterangan]]></text>
-			</staticText>
-			<textField>
-				<reportElement style="Base" x="135" y="292" width="360" height="18" uuid="e997a83c-d27b-4ab5-9bd1-49f39cd44ddc"/>
-				<textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression>
-			</textField>
-		</band>
-	</detail>
+    </queryString>
+    <field name="nik" class="java.lang.String"/>
+    <field name="nama_karyawan" class="java.lang.String"/>
+    <field name="nama_jabatan" class="java.lang.String"/>
+    <field name="nama_divisi" class="java.lang.String"/>
+    <field name="bulan" class="java.lang.String"/>
+    <field name="tahun" class="java.lang.String"/>
+    <field name="gaji_pokok" class="java.math.BigDecimal"/>
+    <field name="tunjangan" class="java.math.BigDecimal"/>
+    <field name="potongan" class="java.math.BigDecimal"/>
+    <field name="total_gaji" class="java.math.BigDecimal"/>
+    <field name="tanggal_gaji" class="java.sql.Date"/>
+    <title>
+        <band height="90">
+            <staticText>
+                <reportElement x="0" y="2" width="515" height="22" uuid="f48537c9-8646-4548-bdd0-7011ad0cb75f"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
+                <text><![CDATA[SISTEM PENGGAJIAN KARYAWAN]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="24" width="515" height="16" uuid="df9e42c4-490f-4701-bea8-5d6e0cd1eb9b"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="9"/></textElement>
+                <text><![CDATA[Jl. Raya Perusahaan No. 01, Jakarta | Telp. (021) 000000 | Email: hrd@perusahaan.com]]></text>
+            </staticText>
+            <line>
+                <reportElement x="0" y="46" width="515" height="1" uuid="2cde1632-f9e3-4669-bd69-f13e7ea40e06"/>
+                <graphicElement><pen lineWidth="2.0" lineStyle="Solid"/></graphicElement>
+            </line>
+            <line>
+                <reportElement x="0" y="50" width="515" height="1" uuid="ec24649c-0ba6-4eee-816f-7d2023620431"/>
+                <graphicElement><pen lineWidth="0.5" lineStyle="Solid"/></graphicElement>
+            </line>
+            <staticText>
+                <reportElement x="0" y="60" width="515" height="22" uuid="29653936-57aa-4021-819e-563ba5fe0c39"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
+                <text><![CDATA[SLIP GAJI KARYAWAN]]></text>
+            </staticText>
+        </band>
+    </title>
+    <detail>
+        <band height="420">
+            <!-- Info Karyawan -->
+            <staticText><reportElement x="0" y="0" width="130" height="18" uuid="2ca9942a-a346-4efa-825b-6541adb20f19"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[NIK]]></text></staticText>
+            <staticText><reportElement x="130" y="0" width="10" height="18" uuid="a2928750-3f04-4c71-a3b8-dcac69817fb8"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[:]]></text></staticText>
+            <textField><reportElement x="140" y="0" width="375" height="18" uuid="7bd0dcef-e09e-452b-a39a-f75d16e74d60"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{nik}]]></textFieldExpression></textField>
+
+            <staticText><reportElement x="0" y="22" width="130" height="18" uuid="433358b2-095e-4cb5-a742-a48b497f6331"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Nama Karyawan]]></text></staticText>
+            <staticText><reportElement x="130" y="22" width="10" height="18" uuid="96db5f24-a089-484e-aa69-c101a74d9230"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[:]]></text></staticText>
+            <textField><reportElement x="140" y="22" width="375" height="18" uuid="3e919fac-9dde-4002-af57-9d6e8ead0a18"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{nama_karyawan}]]></textFieldExpression></textField>
+
+            <staticText><reportElement x="0" y="44" width="130" height="18" uuid="dd86f3f4-818c-4df8-a400-45abfcb8b347"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Jabatan]]></text></staticText>
+            <staticText><reportElement x="130" y="44" width="10" height="18" uuid="c9683f75-606a-4e1d-b227-41d52b2077b7"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[:]]></text></staticText>
+            <textField><reportElement x="140" y="44" width="375" height="18" uuid="df001c34-1f2f-4fc3-8e50-8513657fa00b"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{nama_jabatan}]]></textFieldExpression></textField>
+
+            <staticText><reportElement x="0" y="66" width="130" height="18" uuid="2264a998-dd51-47a7-aca9-3218beba2776"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Divisi]]></text></staticText>
+            <staticText><reportElement x="130" y="66" width="10" height="18" uuid="d75ef52d-f66f-4255-9f70-c1cf6dd3b53d"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[:]]></text></staticText>
+            <textField><reportElement x="140" y="66" width="375" height="18" uuid="c73400e2-9574-47f8-a6ba-acd29bb25020"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{nama_divisi}]]></textFieldExpression></textField>
+
+            <staticText><reportElement x="0" y="88" width="130" height="18" uuid="2457ca86-0cce-4714-ab34-4bcb6d2825eb"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Periode]]></text></staticText>
+            <staticText><reportElement x="130" y="88" width="10" height="18" uuid="0555ef6e-893f-4bcf-a8f5-1d35d272cefc"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[:]]></text></staticText>
+            <textField><reportElement x="140" y="88" width="375" height="18" uuid="19c2fd25-fd5c-489b-acbd-9d40755a0d4b"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{bulan} + " " + $F{tahun}]]></textFieldExpression></textField>
+
+            <line><reportElement x="0" y="116" width="515" height="1" uuid="b04e1c13-b086-4eb2-8590-22e151fc5d53"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement></line>
+
+            <!-- Rincian Gaji -->
+            <staticText><reportElement x="0" y="126" width="260" height="20" uuid="80de48a6-496f-4fb5-b1c7-05830a240195"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Gaji Pokok]]></text></staticText>
+            <textField pattern="#,##0"><reportElement x="260" y="126" width="255" height="20" uuid="20ce946e-954e-4e37-b003-0b6cee3059a5"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{gaji_pokok}]]></textFieldExpression></textField>
+
+            <staticText><reportElement x="0" y="150" width="260" height="20" uuid="b933294e-7be9-453a-a955-0a6e3bb0c5f7"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Tunjangan]]></text></staticText>
+            <textField pattern="#,##0"><reportElement x="260" y="150" width="255" height="20" uuid="366807b2-613d-4090-b1b0-d8818044e56f"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{tunjangan}]]></textFieldExpression></textField>
+
+            <staticText><reportElement x="0" y="174" width="260" height="20" uuid="a952098e-3faf-4f6d-a47d-96fabddc45f5"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Potongan]]></text></staticText>
+            <textField pattern="#,##0"><reportElement x="260" y="174" width="255" height="20" uuid="57145edd-1a37-4fbf-b955-8f4c9e6a5ba7"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{potongan}]]></textFieldExpression></textField>
+
+            <line><reportElement x="0" y="200" width="515" height="1" uuid="597569e1-2e69-425c-a2af-da31794fa7c8"/>
+                <graphicElement><pen lineWidth="1.0"/></graphicElement></line>
+
+            <staticText><reportElement x="0" y="210" width="260" height="22" uuid="94677913-1e9a-4752-8997-7e414d703b5e"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="12" isBold="true"/></textElement><text><![CDATA[TOTAL GAJI]]></text></staticText>
+            <textField pattern="#,##0"><reportElement x="260" y="210" width="255" height="22" uuid="01b8aa45-ab5b-47ea-9384-0bbc6975ad29"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="12" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{total_gaji}]]></textFieldExpression></textField>
+
+            <line><reportElement x="0" y="238" width="515" height="1" uuid="bb77f4af-4b74-42ad-9d05-7f5b78cc9926"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement></line>
+
+            <!-- Tanda tangan -->
+            <textField><reportElement x="315" y="260" width="200" height="18" uuid="007b0a75-39e8-40b4-bd40-573850f2b504"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA["Jakarta, " + new java.text.SimpleDateFormat("dd MMMM yyyy").format($F{tanggal_gaji} != null ? $F{tanggal_gaji} : new java.util.Date())]]></textFieldExpression></textField>
+
+            <staticText><reportElement x="20" y="276" width="160" height="18" uuid="9b2b06a8-9cbe-47ff-945b-e94fffd4942d"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Penerima Gaji,]]></text></staticText>
+            <staticText><reportElement x="315" y="276" width="200" height="18" uuid="fcdeb219-b7d5-423a-826f-d0cd608238df"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Mengetahui,]]></text></staticText>
+            <staticText><reportElement x="315" y="294" width="200" height="18" uuid="22365c5a-8247-4045-973a-aec07c6d18f1"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[HRD]]></text></staticText>
+
+            <textField><reportElement x="20" y="352" width="160" height="18" uuid="a9231b40-7caa-42ec-b744-35e8d08d3242"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA["( " + $F{nama_karyawan} + " )"]]></textFieldExpression></textField>
+            <staticText><reportElement x="315" y="352" width="200" height="18" uuid="7715a66c-13a6-4dcf-b000-d3f6fc6e6005"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[( ________________________ )]]></text></staticText>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="300" height="18" uuid="598cd21c-ab92-4dd5-8406-b8350d097bf9"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="315" y="0" width="150" height="18" uuid="c965437e-91b0-4d67-a6d9-61ead2a898b6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER} + " dari "]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="465" y="0" width="50" height="18" uuid="9db02504-9429-4033-9902-1e327d5081cc"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
 </jasperReport>
+

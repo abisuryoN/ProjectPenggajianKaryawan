@@ -13,6 +13,7 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
         initComponents();
         styleButton();
         tampilData();
+        util.DesignUtil.applyPage(this);
     }
 
     private void styleButton() {
@@ -34,7 +35,7 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
     }
 
     private DefaultTableModel buatModel() {
-        DefaultTableModel model = new DefaultTableModel();
+        DefaultTableModel model = util.TableUtil.nonEditableModel();
         model.addColumn("No");
         model.addColumn("ID Divisi");
         model.addColumn("Nama Divisi");
@@ -50,25 +51,25 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
             Connection conn = Koneksi.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                     "SELECT d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan, "
-                    + "COUNT(k.id_karyawan) AS jumlah_karyawan "
-                    + "FROM divisi d "
-                    + "LEFT JOIN karyawan k ON k.id_divisi = d.id_divisi "
-                    + "GROUP BY d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan "
-                    + "ORDER BY d.id_divisi ASC"
-            );
+                            + "COUNT(k.id_karyawan) AS jumlah_karyawan "
+                            + "FROM divisi d "
+                            + "LEFT JOIN karyawan k ON k.id_divisi = d.id_divisi "
+                            + "GROUP BY d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan "
+                            + "ORDER BY d.id_divisi ASC");
             ResultSet rs = pst.executeQuery();
             int no = 1;
             while (rs.next()) {
-                model.addRow(new Object[]{
-                    no++,
-                    rs.getString("id_divisi"),
-                    rs.getString("nama_divisi"),
-                    rs.getString("kepala_divisi"),
-                    rs.getString("jumlah_karyawan"),
-                    rs.getString("keterangan")
+                model.addRow(new Object[] {
+                        no++,
+                        rs.getString("id_divisi"),
+                        rs.getString("nama_divisi"),
+                        rs.getString("kepala_divisi"),
+                        rs.getString("jumlah_karyawan"),
+                        rs.getString("keterangan")
                 });
             }
             tblDivisi.setModel(model);
+            util.DesignUtil.applyTable(tblDivisi);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Gagal menampilkan laporan divisi: " + e.getMessage());
         }
@@ -81,29 +82,29 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
             Connection conn = Koneksi.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                     "SELECT d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan, "
-                    + "COUNT(k.id_karyawan) AS jumlah_karyawan "
-                    + "FROM divisi d "
-                    + "LEFT JOIN karyawan k ON k.id_divisi = d.id_divisi "
-                    + "WHERE d.nama_divisi LIKE ? OR d.kepala_divisi LIKE ? OR d.keterangan LIKE ? "
-                    + "GROUP BY d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan "
-                    + "ORDER BY d.id_divisi ASC"
-            );
+                            + "COUNT(k.id_karyawan) AS jumlah_karyawan "
+                            + "FROM divisi d "
+                            + "LEFT JOIN karyawan k ON k.id_divisi = d.id_divisi "
+                            + "WHERE d.nama_divisi LIKE ? OR d.kepala_divisi LIKE ? OR d.keterangan LIKE ? "
+                            + "GROUP BY d.id_divisi, d.nama_divisi, d.kepala_divisi, d.keterangan "
+                            + "ORDER BY d.id_divisi ASC");
             pst.setString(1, keyword);
             pst.setString(2, keyword);
             pst.setString(3, keyword);
             ResultSet rs = pst.executeQuery();
             int no = 1;
             while (rs.next()) {
-                model.addRow(new Object[]{
-                    no++,
-                    rs.getString("id_divisi"),
-                    rs.getString("nama_divisi"),
-                    rs.getString("kepala_divisi"),
-                    rs.getString("jumlah_karyawan"),
-                    rs.getString("keterangan")
+                model.addRow(new Object[] {
+                        no++,
+                        rs.getString("id_divisi"),
+                        rs.getString("nama_divisi"),
+                        rs.getString("kepala_divisi"),
+                        rs.getString("jumlah_karyawan"),
+                        rs.getString("keterangan")
                 });
             }
             tblDivisi.setModel(model);
+            util.DesignUtil.applyTable(tblDivisi);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Gagal mencari laporan divisi: " + e.getMessage());
         }
@@ -123,10 +124,12 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
 
     /**
      * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code manually kalau masih mau pakai tab Design NetBeans.
+     * WARNING: Do NOT modify this code manually kalau masih mau pakai tab Design
+     * NetBeans.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         pnlHeader = new javax.swing.JPanel();
@@ -162,23 +165,21 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
         javax.swing.GroupLayout pnlHeaderLayout = new javax.swing.GroupLayout(pnlHeader);
         pnlHeader.setLayout(pnlHeaderLayout);
         pnlHeaderLayout.setHorizontalGroup(
-            pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlHeaderLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTitle)
-                    .addComponent(lblSubtitle))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlHeaderLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblTitle)
+                                        .addComponent(lblSubtitle))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         pnlHeaderLayout.setVerticalGroup(
-            pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlHeaderLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblSubtitle)
-                .addContainerGap(16, Short.MAX_VALUE))
-        );
+                pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlHeaderLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblTitle)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblSubtitle)
+                                .addContainerGap(16, Short.MAX_VALUE)));
 
         lblFilter.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         lblFilter.setForeground(new java.awt.Color(13, 71, 161));
@@ -239,16 +240,15 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
         lblData.setText("DATA LAPORAN DIVISI");
 
         tblDivisi.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
-            },
-            new String [] {
-                "No", "ID Divisi", "Nama Divisi", "Kepala Divisi", "Jumlah Karyawan", "Keterangan"
-            }
-        ));
+                new Object[][] {
+                        { null, null, null, null, null, null },
+                        { null, null, null, null, null, null },
+                        { null, null, null, null, null, null },
+                        { null, null, null, null, null, null }
+                },
+                new String[] {
+                        "No", "ID Divisi", "Nama Divisi", "Kepala Divisi", "Jumlah Karyawan", "Keterangan"
+                }));
         tblDivisi.setFillsViewportHeight(true);
         tblDivisi.setRowHeight(26);
         jScrollPane1.setViewportView(tblDivisi);
@@ -256,82 +256,96 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlHeader, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblFilter)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblCari)
-                        .addGap(38, 38, 38)
-                        .addComponent(lblColon)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(56, 56, 56)
-                        .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(52, 52, 52)
-                        .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lblAksi)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
-                        .addComponent(btnCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(42, 42, 42)
-                        .addComponent(btnExportPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(70, 70, 70)
-                        .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lblData)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 793, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(99, Short.MAX_VALUE))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(pnlHeader, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblFilter)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(lblCari)
+                                                .addGap(38, 38, 38)
+                                                .addComponent(lblColon)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 226,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(56, 56, 56)
+                                                .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 88,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(52, 52, 52)
+                                                .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 88,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(lblAksi)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(38, 38, 38)
+                                                .addComponent(btnCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 94,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(42, 42, 42)
+                                                .addComponent(btnExportPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 130,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(70, 70, 70)
+                                                .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(lblData)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 793,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(99, Short.MAX_VALUE)));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(pnlHeader, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25)
-                .addComponent(lblFilter)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCari)
-                    .addComponent(lblColon)
-                    .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(16, 16, 16)
-                .addComponent(lblAksi)
-                .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnExportPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(28, 28, 28)
-                .addComponent(lblData)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(28, Short.MAX_VALUE))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(pnlHeader, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(25, 25, 25)
+                                .addComponent(lblFilter)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblCari)
+                                        .addComponent(lblColon)
+                                        .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 28,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(16, 16, 16)
+                                .addComponent(lblAksi)
+                                .addGap(16, 16, 16)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnExportPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(28, 28, 28)
+                                .addComponent(lblData)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(28, Short.MAX_VALUE)));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariActionPerformed
+    private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCariActionPerformed
         cariData();
-    }//GEN-LAST:event_btnCariActionPerformed
+    }// GEN-LAST:event_btnCariActionPerformed
 
-    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnResetActionPerformed
         txtCari.setText("");
         tampilData();
-    }//GEN-LAST:event_btnResetActionPerformed
+    }// GEN-LAST:event_btnResetActionPerformed
 
-    private void btnCetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakActionPerformed
+    private void btnCetakActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCetakActionPerformed
         cetakData();
-    }//GEN-LAST:event_btnCetakActionPerformed
+    }// GEN-LAST:event_btnCetakActionPerformed
 
-    private void btnExportPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportPDFActionPerformed
+    private void btnExportPDFActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnExportPDFActionPerformed
         exportPDF();
-    }//GEN-LAST:event_btnExportPDFActionPerformed
+    }// GEN-LAST:event_btnExportPDFActionPerformed
 
-    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRefreshActionPerformed
         tampilData();
-    }//GEN-LAST:event_btnRefreshActionPerformed
+    }// GEN-LAST:event_btnRefreshActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCari;

@@ -26,4 +26,13 @@ public class TableUtil {
     public static boolean hasSelectedRow(JTable table) {
         return table.getSelectedRow() >= 0;
     }
+
+    public static DefaultTableModel nonEditableModel() {
+        return new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+    }
 }

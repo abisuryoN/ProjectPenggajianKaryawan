@@ -1,37 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
               name="laporan_penggajian" pageWidth="842" pageHeight="595" orientation="Landscape"
               columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              whenNoDataType="NoDataSection"
               uuid="d54084cf-7fc9-4cfc-bf1a-84d026ebfce5">
-    <style name="Base" fontName="SansSerif" fontSize="8" forecolor="#000000"/>
-    <style name="Title" style="Base" fontSize="16" isBold="true"/>
-    <style name="Header" style="Base" isBold="true"/>
-
     <parameter name="bulan" class="java.lang.String"/>
     <parameter name="tahun" class="java.lang.String"/>
     <queryString language="SQL">
-        <![CDATA[
-SELECT k.nama_karyawan,
+        <![CDATA[SELECT k.nama_karyawan,
        CASE SUBSTRING(p.periode, 6, 2)
-            WHEN '01' THEN 'Januari' WHEN '02' THEN 'Februari' WHEN '03' THEN 'Maret'
-            WHEN '04' THEN 'April' WHEN '05' THEN 'Mei' WHEN '06' THEN 'Juni'
-            WHEN '07' THEN 'Juli' WHEN '08' THEN 'Agustus' WHEN '09' THEN 'September'
-            WHEN '10' THEN 'Oktober' WHEN '11' THEN 'November' WHEN '12' THEN 'Desember'
-            ELSE SUBSTRING(p.periode, 6, 2) END AS bulan,
+         WHEN '01' THEN 'Januari' WHEN '02' THEN 'Februari' WHEN '03' THEN 'Maret'
+         WHEN '04' THEN 'April'   WHEN '05' THEN 'Mei'      WHEN '06' THEN 'Juni'
+         WHEN '07' THEN 'Juli'    WHEN '08' THEN 'Agustus'  WHEN '09' THEN 'September'
+         WHEN '10' THEN 'Oktober' WHEN '11' THEN 'November' WHEN '12' THEN 'Desember'
+         ELSE SUBSTRING(p.periode, 6, 2)
+       END AS bulan,
        SUBSTRING(p.periode, 1, 4) AS tahun,
-       p.gaji_pokok,
-       p.total_tunjangan AS tunjangan,
-       p.potongan,
-       p.total_gaji,
+       p.gaji_pokok, p.total_tunjangan AS tunjangan, p.potongan, p.total_gaji,
        '' AS keterangan
 FROM penggajian p
 JOIN karyawan k ON k.id_karyawan = p.id_karyawan
-WHERE ($P{tahun} IS NULL OR SUBSTRING(p.periode, 1, 4) = $P{tahun})
-  AND ($P{bulan} IS NULL OR SUBSTRING(p.periode, 6, 2) = $P{bulan})
-ORDER BY p.id_penggajian DESC
-        ]]>
+ORDER BY p.id_penggajian DESC]]>
     </queryString>
     <field name="nama_karyawan" class="java.lang.String"/>
     <field name="bulan" class="java.lang.String"/>
@@ -42,35 +33,137 @@ ORDER BY p.id_penggajian DESC
     <field name="total_gaji" class="java.math.BigDecimal"/>
     <field name="keterangan" class="java.lang.String"/>
     <title>
-        <band height="48">
-            <staticText><reportElement style="Title" x="0" y="0" width="802" height="24" uuid="efe3a812-acdd-4986-bb2d-e2c4cafad467"/><textElement textAlignment="Center"/><text><![CDATA[LAPORAN PENGGAJIAN KARYAWAN]]></text></staticText>
-            <line><reportElement x="0" y="36" width="802" height="1" uuid="f82d31d0-f1cd-49bd-a37b-4fa02f4c898d"/></line>
+        <band height="90">
+            <staticText>
+                <reportElement x="0" y="2" width="802" height="22" uuid="e87c348d-4d0f-41b7-99e1-618306656567"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
+                <text><![CDATA[SISTEM PENGGAJIAN KARYAWAN]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="24" width="802" height="16" uuid="4cc58696-8c47-4e9e-8fc9-fae69476c1af"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="9"/></textElement>
+                <text><![CDATA[Jl. Raya Perusahaan No. 01, Jakarta | Telp. (021) 000000 | Email: hrd@perusahaan.com]]></text>
+            </staticText>
+            <line>
+                <reportElement x="0" y="46" width="802" height="1" uuid="8d0d41da-8a4c-4a59-b69d-f03357d70691"/>
+                <graphicElement><pen lineWidth="2.0" lineStyle="Solid"/></graphicElement>
+            </line>
+            <line>
+                <reportElement x="0" y="50" width="802" height="1" uuid="03fdb0b3-d9f4-4685-8a65-4c191d8d1df1"/>
+                <graphicElement><pen lineWidth="0.5" lineStyle="Solid"/></graphicElement>
+            </line>
+            <staticText>
+                <reportElement x="0" y="60" width="802" height="22" uuid="ee304f49-21a9-4629-b122-2da5b872328c"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
+                <text><![CDATA[LAPORAN PENGGAJIAN KARYAWAN]]></text>
+            </staticText>
         </band>
     </title>
     <columnHeader>
-        <band height="24">
-            <staticText><reportElement style="Header" x="0" y="0" width="30" height="24" uuid="86e27895-1d93-4f8e-ac3d-d6a9d7c14d7f"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center"/><text><![CDATA[No]]></text></staticText>
-            <staticText><reportElement style="Header" x="30" y="0" width="145" height="24" uuid="7d68de01-cf9d-4028-86d2-ed797079ad9c"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Nama Karyawan]]></text></staticText>
-            <staticText><reportElement style="Header" x="175" y="0" width="75" height="24" uuid="9bbef3ad-5c0a-4ab3-9d52-ecc0a6f9ee68"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Bulan]]></text></staticText>
-            <staticText><reportElement style="Header" x="250" y="0" width="45" height="24" uuid="94b584da-1448-4f70-bf3d-d32bff6bbbf9"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Tahun]]></text></staticText>
-            <staticText><reportElement style="Header" x="295" y="0" width="90" height="24" uuid="60acc53e-1c4f-45ba-a0ff-7c4ebc22cf86"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Gaji Pokok]]></text></staticText>
-            <staticText><reportElement style="Header" x="385" y="0" width="90" height="24" uuid="4b9aa83f-fd66-4d0d-8f3f-bb8110f99560"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Tunjangan]]></text></staticText>
-            <staticText><reportElement style="Header" x="475" y="0" width="90" height="24" uuid="0f95a101-403e-4c6c-a178-f24ab01a6d75"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Potongan]]></text></staticText>
-            <staticText><reportElement style="Header" x="565" y="0" width="95" height="24" uuid="2b737070-d8e9-47e2-89a6-66f5018f2f32"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Total Gaji]]></text></staticText>
-            <staticText><reportElement style="Header" x="660" y="0" width="142" height="24" uuid="f454404d-d0b1-450c-a1df-61a7f2a233ee"/><box><pen lineWidth="0.5"/></box><text><![CDATA[Keterangan]]></text></staticText>
+        <band height="20">
+            <staticText><reportElement x="0" y="0" width="30" height="20" uuid="4f92df96-057f-4b08-a1c5-82aebb1d3b90"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[No]]></text></staticText>
+
+            <staticText><reportElement x="30" y="0" width="145" height="20" uuid="a91b0131-fe8a-43b1-ac3d-853d1f38b11b"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Nama Karyawan]]></text></staticText>
+
+            <staticText><reportElement x="175" y="0" width="75" height="20" uuid="7345f924-d305-4271-9c56-65968944194a"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Bulan]]></text></staticText>
+
+            <staticText><reportElement x="250" y="0" width="50" height="20" uuid="9363305f-7795-476c-a8f5-14baa35c5ef8"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Tahun]]></text></staticText>
+
+            <staticText><reportElement x="300" y="0" width="95" height="20" uuid="97b26b66-0789-482b-a996-bc1b80c3269b"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Gaji Pokok]]></text></staticText>
+
+            <staticText><reportElement x="395" y="0" width="90" height="20" uuid="908c9778-4564-43c0-bc9f-9f3a8feb8b4e"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Tunjangan]]></text></staticText>
+
+            <staticText><reportElement x="485" y="0" width="90" height="20" uuid="b4663172-cfe3-46c9-9378-ddc517126cb5"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Potongan]]></text></staticText>
+
+            <staticText><reportElement x="575" y="0" width="100" height="20" uuid="5fc48650-971c-40cc-8387-ac33b83cf134"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Total Gaji]]></text></staticText>
+
+            <staticText><reportElement x="675" y="0" width="127" height="20" uuid="5a78643d-e9a6-4188-9904-0703461d3340"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[Keterangan]]></text></staticText>
+
         </band>
     </columnHeader>
     <detail>
-        <band height="22">
-            <textField><reportElement style="Base" x="0" y="0" width="30" height="22" uuid="dcf37570-6700-4e3b-b225-c49e6c64da05"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center"/><textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression></textField>
-            <textField><reportElement style="Base" x="30" y="0" width="145" height="22" uuid="9733e979-fc51-428d-a6ac-67609f4ad2ef"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{nama_karyawan}]]></textFieldExpression></textField>
-            <textField><reportElement style="Base" x="175" y="0" width="75" height="22" uuid="3e6f64c9-dc84-491d-9fb1-b0da5fd22a75"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{bulan}]]></textFieldExpression></textField>
-            <textField><reportElement style="Base" x="250" y="0" width="45" height="22" uuid="65cb0e1f-d5be-45c6-926e-0c8cb0835d19"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{tahun}]]></textFieldExpression></textField>
-            <textField pattern="#,##0.00"><reportElement style="Base" x="295" y="0" width="90" height="22" uuid="4cb82cf4-a464-4c81-932f-60ee32a81df3"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{gaji_pokok}]]></textFieldExpression></textField>
-            <textField pattern="#,##0.00"><reportElement style="Base" x="385" y="0" width="90" height="22" uuid="41f2db17-1420-4f92-bb16-2470f913412d"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{tunjangan}]]></textFieldExpression></textField>
-            <textField pattern="#,##0.00"><reportElement style="Base" x="475" y="0" width="90" height="22" uuid="e705834a-e17a-4090-b5d8-6c686b461e37"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{potongan}]]></textFieldExpression></textField>
-            <textField pattern="#,##0.00"><reportElement style="Base" x="565" y="0" width="95" height="22" uuid="e69b6035-1f56-4674-9785-f4e70717ff43"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{total_gaji}]]></textFieldExpression></textField>
-            <textField><reportElement style="Base" x="660" y="0" width="142" height="22" uuid="f02e9b8d-f80f-4e32-a9f2-f66d5ca22e0b"/><box><pen lineWidth="0.5"/></box><textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression></textField>
+        <band height="18">
+            <textField><reportElement x="0" y="0" width="30" height="18" uuid="4ca7ac5e-a2ac-4f5a-87c1-dc096d2f227e"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="30" y="0" width="145" height="18" uuid="b4ff17d6-45ab-4e9c-9e89-07e0eb7ff45a"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{nama_karyawan}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="175" y="0" width="75" height="18" uuid="efa1cc6b-4b88-44f3-bbee-ef84480b5a10"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{bulan}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="250" y="0" width="50" height="18" uuid="70186a35-6b08-4069-9666-d046acf1e54e"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{tahun}]]></textFieldExpression></textField>
+
+            <textField pattern="#,##0"><reportElement x="300" y="0" width="95" height="18" uuid="5b8d5906-7bb6-4b09-81a9-1dc1c86fb800"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{gaji_pokok}]]></textFieldExpression></textField>
+
+            <textField pattern="#,##0"><reportElement x="395" y="0" width="90" height="18" uuid="8f2593b5-24eb-4462-8841-3117d50cbfa9"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{tunjangan}]]></textFieldExpression></textField>
+
+            <textField pattern="#,##0"><reportElement x="485" y="0" width="90" height="18" uuid="56c0622b-22c1-45b3-a661-78f2a7166d54"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{potongan}]]></textFieldExpression></textField>
+
+            <textField pattern="#,##0"><reportElement x="575" y="0" width="100" height="18" uuid="0d71311d-32f1-46c8-85d9-d8971a415577"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{total_gaji}]]></textFieldExpression></textField>
+
+            <textField><reportElement x="675" y="0" width="127" height="18" uuid="14cba4b3-48db-4215-b1af-d56ebb8e6224"/><box topPadding="2" bottomPadding="2" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA[$F{keterangan}]]></textFieldExpression></textField>
+
         </band>
     </detail>
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="300" height="18" uuid="0b2516a7-0e85-4079-9627-892a952828ab"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="602" y="0" width="150" height="18" uuid="665b0be6-7404-488e-8b5c-f23f6c9126b3"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER} + " dari "]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="752" y="0" width="50" height="18" uuid="2a096422-4bf5-4fe7-b6ff-df141fb51ca2"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="110">
+            <staticText>
+                <reportElement x="40" y="10" width="180" height="16" uuid="408ec1e3-a2cd-4750-8749-b0acd1a6fffb"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[Mengetahui,]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="40" y="26" width="180" height="16" uuid="1ac616a0-3407-4c0d-be16-7c21dda9dd3c"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement>
+                <text><![CDATA[HRD]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="40" y="72" width="180" height="16" uuid="a532446d-7e11-4dfc-ac7f-bd5f01723be7"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[( _________________________ )]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="552" y="10" width="200" height="16" uuid="5c5c7448-f0ee-4287-991b-d0dc49a97bf8"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[Menyetujui,]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="552" y="26" width="200" height="16" uuid="bf8492b8-4f61-4dec-8e4b-784edf2fd076"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement>
+                <text><![CDATA[Direktur / Pimpinan]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="552" y="72" width="200" height="16" uuid="cb07ec2f-bb4d-48a1-ad7a-9461920c7f32"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <text><![CDATA[( _________________________ )]]></text>
+            </staticText>
+        </band>
+    </summary>
+    <noData>
+        <band height="40">
+            <staticText>
+                <reportElement x="0" y="0" width="802" height="40" uuid="b2c4016a-4c67-4892-bf0c-4225a368c477"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="11" isBold="true"/></textElement>
+                <text><![CDATA[Tidak ada data penggajian yang ditemukan.]]></text>
+            </staticText>
+        </band>
+    </noData>
 </jasperReport>
+

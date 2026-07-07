@@ -10,7 +10,6 @@ import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
 
 public class ReportUtil {
@@ -29,7 +28,9 @@ public class ReportUtil {
                 return;
             }
 
-            JasperViewer.viewReport(print, false);
+            JasperViewer viewer = new JasperViewer(print, false);
+            viewer.setTitle("Preview Laporan - " + reportName);
+            viewer.setVisible(true);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Gagal membuka laporan Jasper: " + e.getMessage());
         }
@@ -58,24 +59,6 @@ public class ReportUtil {
             return JasperCompileManager.compileReport(jrxmlStream);
         }
 
-        String jasperPath = "/panel/laporan/" + reportName + ".jasper";
-        InputStream jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
-        if (jasperStream != null) {
-            return (JasperReport) JRLoader.loadObject(jasperStream);
-        }
-
-        jasperPath = "/laporan/" + reportName + ".jasper";
-        jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
-        if (jasperStream != null) {
-            return (JasperReport) JRLoader.loadObject(jasperStream);
-        }
-
-        jasperPath = "/reports/" + reportName + ".jasper";
-        jasperStream = ReportUtil.class.getResourceAsStream(jasperPath);
-        if (jasperStream != null) {
-            return (JasperReport) JRLoader.loadObject(jasperStream);
-        }
-
-        throw new IllegalArgumentException("File report tidak ditemukan: " + reportName);
+        throw new IllegalArgumentException("File JRXML report tidak ditemukan: " + reportName);
     }
 }

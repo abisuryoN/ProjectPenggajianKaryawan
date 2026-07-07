@@ -83,7 +83,7 @@ private String formatRupiah(String angka) {
 }
 
 private void tampilData() {
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = util.TableUtil.nonEditableModel();
     model.addColumn("NO");
     model.addColumn("Nama Karyawan");
     model.addColumn("Bulan");
@@ -126,6 +126,7 @@ private void tampilData() {
             });
         }
         tblLaporanGaji.setModel(model);
+        util.DesignUtil.applyTable(tblLaporanGaji);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal tampil data: " + e.getMessage());
     }
@@ -142,7 +143,7 @@ private String getNamaBulan(String angka) {
 }
 
 private void filterData() {
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = util.TableUtil.nonEditableModel();
     model.addColumn("NO");
     model.addColumn("Nama Karyawan");
     model.addColumn("Bulan");
@@ -203,6 +204,7 @@ private void filterData() {
             });
         }
         tblLaporanGaji.setModel(model);
+        util.DesignUtil.applyTable(tblLaporanGaji);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal filter: " + e.getMessage());
     }
