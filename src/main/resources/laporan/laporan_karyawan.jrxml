@@ -9,7 +9,8 @@
     <style name="Title" style="Base" fontSize="16" isBold="true"/>
     <style name="Header" style="Base" fontSize="9" isBold="true"/>
 
-    <queryString language="SQL">
+        <parameter name="tanggal_cetak" class="java.lang.String"><defaultValueExpression><![CDATA[""]]></defaultValueExpression></parameter>
+<queryString language="SQL">
         <![CDATA[
 SELECT k.id_karyawan, k.nik, k.nama_karyawan, k.jenis_kelamin, k.alamat, k.no_hp,
        d.nama_divisi, j.nama_jabatan
@@ -29,12 +30,16 @@ ORDER BY k.id_karyawan ASC
     <field name="nama_jabatan" class="java.lang.String"/>
 
     <title>
-        <band height="86">
+        <band height="90">
             <staticText><reportElement style="Title" x="0" y="0" width="802" height="22" uuid="ad222e89-7686-43b5-9a44-ee08226ba596"/><textElement textAlignment="Center"/><text><![CDATA[SISTEM PENGGAJIAN KARYAWAN]]></text></staticText>
             <staticText><reportElement style="Base" x="0" y="24" width="802" height="14" uuid="cf40b51b-df0d-4931-b2ce-76c65ed843a4"/><textElement textAlignment="Center"/><text><![CDATA[Jl. Raya Perusahaan No. 01, Jakarta]]></text></staticText>
             <staticText><reportElement style="Base" x="0" y="39" width="802" height="14" uuid="a5a10197-fd91-48a0-9f90-83d46d42b8c8"/><textElement textAlignment="Center"/><text><![CDATA[Telp. (021) 000000 | Email: hrd@perusahaan.com]]></text></staticText>
             <line><reportElement x="0" y="58" width="802" height="1" uuid="3f2c62eb-4c54-4364-88f1-4615a028217e"/></line>
-            <staticText><reportElement style="Header" x="0" y="66" width="802" height="18" uuid="ef7c8699-d55d-421f-b546-021c6caf3116"/><textElement textAlignment="Center"/><text><![CDATA[LAPORAN DATA KARYAWAN]]></text></staticText>
+            <staticText>
+                <reportElement x="0" y="66" width="802" height="22" uuid="ef7c8699-d55d-421f-b546-021c6caf3116"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
+                <text><![CDATA[LAPORAN DATA KARYAWAN]]></text>
+            </staticText>
         </band>
     </title>
     <columnHeader>
@@ -68,7 +73,7 @@ ORDER BY k.id_karyawan ASC
             <textField>
                 <reportElement style="Base" x="0" y="0" width="300" height="18" uuid="b59ed64c-4fb2-44bb-b827-8f1b2cbdccaa"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><font size="8"/></textElement>
-                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement style="Base" x="602" y="0" width="150" height="18" uuid="a40dd329-4885-46bf-a3e0-e2f17c7bd071"/>
@@ -83,13 +88,18 @@ ORDER BY k.id_karyawan ASC
         </band>
     </pageFooter>
     <summary>
-        <band height="105">
-            <staticText><reportElement style="Base" x="0" y="18" width="200" height="16" uuid="c4d26f6a-b4be-42eb-a4a9-fe5884b89670"/><textElement textAlignment="Center"/><text><![CDATA[Mengetahui,]]></text></staticText>
-            <line><reportElement x="25" y="72" width="150" height="1" uuid="ab9314f9-8e24-466f-a54a-a2d5b03a7c3c"/></line>
-            <staticText><reportElement style="Header" x="0" y="78" width="200" height="16" uuid="79232d7b-1554-485d-942a-29e1f59197ce"/><textElement textAlignment="Center"/><text><![CDATA[HRD]]></text></staticText>
-            <staticText><reportElement style="Base" x="602" y="18" width="200" height="16" uuid="d11bf0d4-5940-48f3-a00a-4db603cfb848"/><textElement textAlignment="Center"/><text><![CDATA[Mengetahui,]]></text></staticText>
-            <line><reportElement x="627" y="72" width="150" height="1" uuid="e940f593-9b16-44bf-9fb4-568d8bd0ef93"/></line>
-            <staticText><reportElement style="Header" x="602" y="78" width="200" height="16" uuid="d708af05-af0e-4c68-9ad7-6cf01041ed68"/><textElement textAlignment="Center"/><text><![CDATA[Direktur / Pimpinan]]></text></staticText>
+        <band height="133">
+                        <textField>
+                <reportElement style="Base" x="602" y="28" width="200" height="16" uuid="79902a39-865f-4d0f-b9b8-2560870f445f"/>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA["Bogor, " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <staticText><reportElement style="Base" x="0" y="46" width="200" height="16" uuid="c4d26f6a-b4be-42eb-a4a9-fe5884b89670"/><textElement textAlignment="Center"/><text><![CDATA[Mengetahui,]]></text></staticText>
+            <line><reportElement x="25" y="100" width="150" height="1" uuid="ab9314f9-8e24-466f-a54a-a2d5b03a7c3c"/></line>
+            <staticText><reportElement style="Header" x="0" y="106" width="200" height="16" uuid="79232d7b-1554-485d-942a-29e1f59197ce"/><textElement textAlignment="Center"/><text><![CDATA[HRD]]></text></staticText>
+            <staticText><reportElement style="Base" x="602" y="46" width="200" height="16" uuid="d11bf0d4-5940-48f3-a00a-4db603cfb848"/><textElement textAlignment="Center"/><text><![CDATA[Menyetujui,]]></text></staticText>
+            <line><reportElement x="627" y="100" width="150" height="1" uuid="e940f593-9b16-44bf-9fb4-568d8bd0ef93"/></line>
+            <staticText><reportElement style="Header" x="602" y="106" width="200" height="16" uuid="d708af05-af0e-4c68-9ad7-6cf01041ed68"/><textElement textAlignment="Center"/><text><![CDATA[Direktur / Pimpinan]]></text></staticText>
         </band>
     </summary>
 </jasperReport>

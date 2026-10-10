@@ -9,19 +9,31 @@ import javax.swing.table.DefaultTableModel;
 
 public class LaporanDivisiPanel extends javax.swing.JPanel {
 
+    /** Tanggal cetak format Indonesia, mengikuti hari saat laporan dicetak. */
+    private static String tanggalCetakIndonesia() {
+        java.time.LocalDate t = java.time.LocalDate.now();
+        String[] hari = {"", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"};
+        String[] bulan = {"", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+        return hari[t.getDayOfWeek().getValue()] + ", " + t.getDayOfMonth() + " "
+                + bulan[t.getMonthValue()] + " " + t.getYear();
+    }
+
     public LaporanDivisiPanel() {
         initComponents();
         styleButton();
         tampilData();
         util.DesignUtil.applyPage(this);
+        tblDivisi.setDefaultEditor(Object.class, null);
+        tblDivisi.getTableHeader().setReorderingAllowed(false);
     }
 
     private void styleButton() {
-        styleFilledButton(btnCari, new java.awt.Color(13, 71, 161), java.awt.Color.WHITE);
-        styleFilledButton(btnCetak, new java.awt.Color(13, 71, 161), java.awt.Color.WHITE);
-        styleFilledButton(btnExportPDF, new java.awt.Color(13, 71, 161), java.awt.Color.WHITE);
-        styleFilledButton(btnRefresh, new java.awt.Color(13, 71, 161), java.awt.Color.WHITE);
-        styleFilledButton(btnReset, new java.awt.Color(245, 245, 245), java.awt.Color.BLACK);
+        util.DesignUtil.styleFilledButton(btnCari, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+        util.DesignUtil.styleFilledButton(btnCetak, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+        util.DesignUtil.styleFilledButton(btnExportPDF, util.DesignUtil.TOMBOL_SEKUNDER, java.awt.Color.WHITE);
+        util.DesignUtil.styleFilledButton(btnRefresh, util.DesignUtil.TOMBOL_NETRAL, util.DesignUtil.TEKS_GELAP);
+        util.DesignUtil.styleFilledButton(btnReset, util.DesignUtil.TOMBOL_BAHAYA, java.awt.Color.WHITE);
     }
 
     private void styleFilledButton(javax.swing.JButton button, java.awt.Color bg, java.awt.Color fg) {
@@ -112,7 +124,9 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
 
     private void cetakData() {
         try {
-            util.ReportUtil.showReport("laporan_divisi", new java.util.HashMap<String, Object>());
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("tanggal_cetak", tanggalCetakIndonesia());
+            util.ReportUtil.showReport("laporan_divisi", params);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Gagal mencetak laporan divisi: " + e.getMessage());
         }
@@ -128,202 +142,209 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
      * NetBeans.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated
-    // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlHeader = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
-        lblSubtitle = new javax.swing.JLabel();
-        lblFilter = new javax.swing.JLabel();
+        jPanelFilter = new javax.swing.JPanel();
         lblCari = new javax.swing.JLabel();
-        lblColon = new javax.swing.JLabel();
         txtCari = new javax.swing.JTextField();
+        pnlAksi = new javax.swing.JPanel();
         btnCari = new javax.swing.JButton();
-        btnReset = new javax.swing.JButton();
-        lblAksi = new javax.swing.JLabel();
         btnCetak = new javax.swing.JButton();
         btnExportPDF = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
-        lblData = new javax.swing.JLabel();
+        btnReset = new javax.swing.JButton();
+        jPanelData = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblDivisi = new javax.swing.JTable();
 
-        setBackground(new java.awt.Color(255, 255, 255));
-        setPreferredSize(new java.awt.Dimension(900, 600));
-
-        pnlHeader.setBackground(new java.awt.Color(13, 71, 161));
+        setBackground(new java.awt.Color(244, 247, 250));
 
         lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblTitle.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitle.setForeground(new java.awt.Color(22, 48, 92));
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTitle.setText("LAPORAN DATA DIVISI");
 
-        lblSubtitle.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblSubtitle.setForeground(new java.awt.Color(255, 255, 255));
-        lblSubtitle.setText("Sistem Penggajian Karyawan");
+        jPanelFilter.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filter Pencarian", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(22, 48, 92))); // NOI18N
 
-        javax.swing.GroupLayout pnlHeaderLayout = new javax.swing.GroupLayout(pnlHeader);
-        pnlHeader.setLayout(pnlHeaderLayout);
-        pnlHeaderLayout.setHorizontalGroup(
-                pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnlHeaderLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblTitle)
-                                        .addComponent(lblSubtitle))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-        pnlHeaderLayout.setVerticalGroup(
-                pnlHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnlHeaderLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTitle)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblSubtitle)
-                                .addContainerGap(16, Short.MAX_VALUE)));
-
-        lblFilter.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        lblFilter.setForeground(new java.awt.Color(13, 71, 161));
-        lblFilter.setText("FILTER PENCARIAN");
-
-        lblCari.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblCari.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         lblCari.setText("Cari Divisi");
 
-        lblColon.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lblColon.setText(":");
+        txtCari.setPreferredSize(new java.awt.Dimension(300, 34));
 
-        btnCari.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        javax.swing.GroupLayout jPanelFilterLayout = new javax.swing.GroupLayout(jPanelFilter);
+        jPanelFilter.setLayout(jPanelFilterLayout);
+        jPanelFilterLayout.setHorizontalGroup(
+            jPanelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFilterLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblCari)
+                .addGap(18, 18, 18)
+                .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+        jPanelFilterLayout.setVerticalGroup(
+            jPanelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFilterLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblCari)
+                    .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pnlAksi.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Aksi", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(22, 48, 92))); // NOI18N
+
+        btnCari.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnCari.setText("Cari");
+
+        btnCetak.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnCetak.setText("Cetak");
+
+        btnExportPDF.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnExportPDF.setText("Export PDF");
+
+        btnRefresh.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnRefresh.setText("Refresh");
+
+        btnReset.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnReset.setText("Reset");
+
         btnCari.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCariActionPerformed(evt);
             }
         });
 
-        btnReset.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnReset.setText("Reset");
-        btnReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetActionPerformed(evt);
-            }
-        });
-
-        lblAksi.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        lblAksi.setForeground(new java.awt.Color(13, 71, 161));
-        lblAksi.setText("AKSI");
-
-        btnCetak.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnCetak.setText("CETAK");
         btnCetak.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCetakActionPerformed(evt);
             }
         });
 
-        btnExportPDF.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnExportPDF.setText("Export PDF");
         btnExportPDF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExportPDFActionPerformed(evt);
             }
         });
 
-        btnRefresh.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnRefresh.setText("Refresh");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRefreshActionPerformed(evt);
             }
         });
 
-        lblData.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        lblData.setForeground(new java.awt.Color(13, 71, 161));
-        lblData.setText("DATA LAPORAN DIVISI");
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlAksiLayout = new javax.swing.GroupLayout(pnlAksi);
+        pnlAksi.setLayout(pnlAksiLayout);
+        pnlAksiLayout.setHorizontalGroup(
+            pnlAksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlAksiLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnCari)
+                .addGap(10, 10, 10)
+                .addComponent(btnCetak)
+                .addGap(10, 10, 10)
+                .addComponent(btnExportPDF)
+                .addGap(10, 10, 10)
+                .addComponent(btnRefresh)
+                .addGap(10, 10, 10)
+                .addComponent(btnReset)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+        pnlAksiLayout.setVerticalGroup(
+            pnlAksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlAksiLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlAksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCari)
+                    .addComponent(btnCetak)
+                    .addComponent(btnExportPDF)
+                    .addComponent(btnRefresh)
+                    .addComponent(btnReset))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanelData.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Laporan Divisi", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(22, 48, 92))); // NOI18N
 
         tblDivisi.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][] {
-                        { null, null, null, null, null, null },
-                        { null, null, null, null, null, null },
-                        { null, null, null, null, null, null },
-                        { null, null, null, null, null, null }
-                },
-                new String[] {
-                        "No", "ID Divisi", "Nama Divisi", "Kepala Divisi", "Jumlah Karyawan", "Keterangan"
-                }));
-        tblDivisi.setFillsViewportHeight(true);
-        tblDivisi.setRowHeight(26);
+            new Object [][] {
+
+            },
+            new String [] {
+                "No", "ID Divisi", "Nama Divisi", "Kepala Divisi", "Jumlah Karyawan", "Keterangan"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(tblDivisi);
+        tblDivisi.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        tblDivisi.setFillsViewportHeight(true);
+
+        javax.swing.GroupLayout jPanelDataLayout = new javax.swing.GroupLayout(jPanelData);
+        jPanelData.setLayout(jPanelDataLayout);
+        jPanelDataLayout.setHorizontalGroup(
+            jPanelDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelDataLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1)
+                .addGap(8, 8, 8))
+        );
+        jPanelDataLayout.setVerticalGroup(
+            jPanelDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelDataLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                .addGap(8, 8, 8))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(pnlHeader, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblFilter)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(lblCari)
-                                                .addGap(38, 38, 38)
-                                                .addComponent(lblColon)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 226,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(56, 56, 56)
-                                                .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 88,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(52, 52, 52)
-                                                .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 88,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(lblAksi)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(38, 38, 38)
-                                                .addComponent(btnCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 94,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(42, 42, 42)
-                                                .addComponent(btnExportPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 130,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(70, 70, 70)
-                                                .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(lblData)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 793,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(99, Short.MAX_VALUE)));
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanelFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(pnlAksi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanelData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(26, 26, 26))
+        );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(pnlHeader, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(25, 25, 25)
-                                .addComponent(lblFilter)
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblCari)
-                                        .addComponent(lblColon)
-                                        .addComponent(txtCari, javax.swing.GroupLayout.PREFERRED_SIZE, 28,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnCari, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(16, 16, 16)
-                                .addComponent(lblAksi)
-                                .addGap(16, 16, 16)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnExportPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(28, 28, 28)
-                                .addComponent(lblData)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(28, Short.MAX_VALUE)));
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanelFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlAksi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
+                .addComponent(jPanelData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(14, 14, 14))
+        );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCariActionPerformed
@@ -353,15 +374,12 @@ public class LaporanDivisiPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnExportPDF;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnReset;
+    private javax.swing.JPanel jPanelData;
+    private javax.swing.JPanel jPanelFilter;
+    private javax.swing.JPanel pnlAksi;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblAksi;
     private javax.swing.JLabel lblCari;
-    private javax.swing.JLabel lblColon;
-    private javax.swing.JLabel lblData;
-    private javax.swing.JLabel lblFilter;
-    private javax.swing.JLabel lblSubtitle;
     private javax.swing.JLabel lblTitle;
-    private javax.swing.JPanel pnlHeader;
     private javax.swing.JTable tblDivisi;
     private javax.swing.JTextField txtCari;
     // End of variables declaration//GEN-END:variables

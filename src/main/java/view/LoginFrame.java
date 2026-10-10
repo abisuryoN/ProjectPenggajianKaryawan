@@ -37,9 +37,10 @@ public class LoginFrame extends JFrame {
     private void initUI() {
         setTitle("Login - Sistem Penggajian Karyawan");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(980, 560);
+        setSize(1100, 640);
         setLocationRelativeTo(null);
-        setResizable(false);
+        // bisa di-resize / maximize; isi form tetap rapi karena GridBagLayout
+        setResizable(true);
         setLayout(new BorderLayout());
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -84,12 +85,12 @@ public class LoginFrame extends JFrame {
         icon.setAlignmentX(LEFT_ALIGNMENT);
 
         JLabel title = new JLabel("PENGGAJIAN");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 34));
+        title.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 34));
         title.setForeground(Color.WHITE);
         title.setAlignmentX(LEFT_ALIGNMENT);
 
         JLabel subtitle = new JLabel("SISTEM MANAJEMEN KARYAWAN");
-        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        subtitle.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 15));
         subtitle.setForeground(new Color(222, 240, 245));
         subtitle.setAlignmentX(LEFT_ALIGNMENT);
 
@@ -132,7 +133,7 @@ public class LoginFrame extends JFrame {
 
     private JLabel createFeatureLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        label.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 15));
         label.setForeground(new Color(236, 248, 250));
         label.setAlignmentX(LEFT_ALIGNMENT);
         return label;
@@ -147,23 +148,24 @@ public class LoginFrame extends JFrame {
         formPanel.setPreferredSize(new Dimension(420, 360));
 
         JLabel title = new JLabel("Selamat Datang");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 28));
         title.setForeground(new Color(24, 50, 92));
 
         JLabel subtitle = new JLabel("Silakan login untuk melanjutkan");
-        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        subtitle.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 15));
         subtitle.setForeground(new Color(102, 110, 125));
 
         JLabel lblUsername = new JLabel("Username");
-        lblUsername.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblUsername.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 13));
 
         JLabel lblPassword = new JLabel("Password");
-        lblPassword.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblPassword.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 13));
 
         txtUsername = new JTextField();
         txtPassword = new JPasswordField();
-        txtUsername.setPreferredSize(new Dimension(360, 44));
-        txtPassword.setPreferredSize(new Dimension(360, 44));
+        // width ikut lebar kolom GridBagLayout (fill HORIZONTAL), cukup kunci tingginya saja
+        txtUsername.setPreferredSize(new Dimension(10, 44));
+        txtPassword.setPreferredSize(new Dimension(10, 44));
         txtUsername.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(215, 221, 228)),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)));
@@ -172,8 +174,8 @@ public class LoginFrame extends JFrame {
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)));
 
         btnLogin = new JButton("MASUK");
-        btnLogin.setPreferredSize(new Dimension(360, 48));
-        btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btnLogin.setPreferredSize(new Dimension(10, 48));
+        btnLogin.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 20));
         btnLogin.setBackground(new Color(28, 49, 92));
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setFocusPainted(false);
@@ -184,11 +186,11 @@ public class LoginFrame extends JFrame {
         btnLogin.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
 
         JLabel info = new JLabel("Akun login dibuat oleh HRD. Tidak ada registrasi mandiri.");
-        info.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        info.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 13));
         info.setForeground(new Color(0, 139, 122));
 
         JLabel demo = new JLabel("Demo: hrd / hrd123   |   karyawan / karyawan123");
-        demo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        demo.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 12));
         demo.setForeground(new Color(120, 126, 138));
 
         GridBagConstraints gbc = new GridBagConstraints();

@@ -693,8 +693,9 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        lblTitle.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lblTitle.setText("PENGGAJIAN KARYAWAN");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTitle.setText("Penggajian Karyawan");
+        lblTitle.setForeground(new java.awt.Color(18, 40, 90)); // NOI18N
 
         tblPenggajian.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -730,7 +731,7 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
                         .addContainerGap())))
             .addGroup(pnlUtamaLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(pnlForm, javax.swing.GroupLayout.PREFERRED_SIZE, 613, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlForm, javax.swing.GroupLayout.PREFERRED_SIZE, 613, Short.MAX_VALUE)
                 .addGap(0, 525, Short.MAX_VALUE))
         );
         pnlUtamaLayout.setVerticalGroup(
@@ -741,7 +742,7 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
                 .addGap(18, 18, 18)
                 .addComponent(pnlForm, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, Short.MAX_VALUE)
                 .addContainerGap(163, Short.MAX_VALUE))
         );
 
@@ -751,13 +752,13 @@ private void addRowInfo(com.itextpdf.text.pdf.PdfPTable table, String label, Str
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlUtama, javax.swing.GroupLayout.PREFERRED_SIZE, 1152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlUtama, javax.swing.GroupLayout.DEFAULT_SIZE, 1152, Short.MAX_VALUE)
                 .addContainerGap(4279, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(pnlUtama, javax.swing.GroupLayout.PREFERRED_SIZE, 746, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlUtama, javax.swing.GroupLayout.DEFAULT_SIZE, 746, Short.MAX_VALUE)
                 .addGap(0, 247, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents

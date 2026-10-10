@@ -70,7 +70,7 @@ ORDER BY id_tunjangan ASC]]>
             <textField>
                 <reportElement x="0" y="0" width="300" height="18" uuid="64f47db9-bcfe-40ee-b208-215a1b315a10"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
-                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement x="602" y="0" width="150" height="18" uuid="5b0f1f37-16cc-4cdf-a2a8-3936487a1da5"/>
@@ -86,6 +86,11 @@ ORDER BY id_tunjangan ASC]]>
     </pageFooter>
     <summary>
         <band height="110">
+            <textField>
+                <reportElement x="552" y="0" width="200" height="16" uuid="42db3f93-7a9d-41b1-a94a-0bd8bd08346d"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <textFieldExpression><![CDATA["Bogor, " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression>
+            </textField>
             <staticText>
                 <reportElement x="40" y="10" width="180" height="16" uuid="be7628d6-2dab-45f2-b0f0-3194b5d7fb41"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
@@ -102,17 +107,17 @@ ORDER BY id_tunjangan ASC]]>
                 <text><![CDATA[( _________________________ )]]></text>
             </staticText>
             <staticText>
-                <reportElement x="552" y="10" width="200" height="16" uuid="b25fb753-63c1-4a6d-8c77-78f4b0858fe9"/>
+                <reportElement x="552" y="18" width="200" height="16" uuid="b25fb753-63c1-4a6d-8c77-78f4b0858fe9"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
                 <text><![CDATA[Menyetujui,]]></text>
             </staticText>
             <staticText>
-                <reportElement x="552" y="26" width="200" height="16" uuid="6168f0a6-0939-462a-9374-792f19c3dbbd"/>
+                <reportElement x="552" y="34" width="200" height="16" uuid="6168f0a6-0939-462a-9374-792f19c3dbbd"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement>
                 <text><![CDATA[Direktur / Pimpinan]]></text>
             </staticText>
             <staticText>
-                <reportElement x="552" y="72" width="200" height="16" uuid="7adc4892-5645-4a05-aaf2-be566864076a"/>
+                <reportElement x="552" y="80" width="200" height="16" uuid="7adc4892-5645-4a05-aaf2-be566864076a"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
                 <text><![CDATA[( _________________________ )]]></text>
             </staticText>

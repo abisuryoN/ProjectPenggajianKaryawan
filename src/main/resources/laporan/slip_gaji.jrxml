@@ -134,7 +134,7 @@ WHERE p.id_penggajian = $P{id_gaji}]]>
 
             <!-- Tanda tangan -->
             <textField><reportElement x="315" y="260" width="200" height="18" uuid="007b0a75-39e8-40b4-bd40-573850f2b504"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA["Jakarta, " + new java.text.SimpleDateFormat("dd MMMM yyyy").format($F{tanggal_gaji} != null ? $F{tanggal_gaji} : new java.util.Date())]]></textFieldExpression></textField>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><textFieldExpression><![CDATA["Bogor, " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format($F{tanggal_gaji} != null ? $F{tanggal_gaji} : new java.util.Date())]]></textFieldExpression></textField>
 
             <staticText><reportElement x="20" y="276" width="160" height="18" uuid="9b2b06a8-9cbe-47ff-945b-e94fffd4942d"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement><text><![CDATA[Penerima Gaji,]]></text></staticText>
@@ -154,7 +154,7 @@ WHERE p.id_penggajian = $P{id_gaji}]]>
             <textField>
                 <reportElement x="0" y="0" width="300" height="18" uuid="598cd21c-ab92-4dd5-8406-b8350d097bf9"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
-                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement x="315" y="0" width="150" height="18" uuid="c965437e-91b0-4d67-a6d9-61ead2a898b6"/>

@@ -31,15 +31,91 @@ public final class DesignUtil {
     private static final Color PRIMARY = new Color(22, 48, 92);
     private static final Color LINE = new Color(220, 226, 235);
 
+    // ---- Palet bersama panel laporan (dipakai semua panel agar warnanya sama) ----
+    public static final Color WARNA_JUDUL = PRIMARY;                  // navy judul
+    public static final Color TOMBOL_UTAMA = new Color(37, 99, 235);  // biru
+    public static final Color TOMBOL_SEKUNDER = new Color(20, 184, 166); // teal
+    public static final Color TOMBOL_BAHAYA = new Color(239, 68, 68); // merah
+    public static final Color TOMBOL_NETRAL = new Color(243, 244, 246); // abu terang
+    public static final Color TEKS_GELAP = new Color(17, 24, 39);
+
+    /** Font UI yang benar-benar ada di sistem (Windows pakai Segoe UI, Linux pakai font sistem). */
+    public static final String UI_FONT;
+
+    static {
+        String[] kandidat = {"Segoe UI", "Inter", "Ubuntu", "Cantarell", "Noto Sans", "DejaVu Sans", "Dialog"};
+        java.util.Set<String> tersedia = new java.util.HashSet<>(java.util.Arrays.asList(
+                java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()));
+        String pilihan = "Dialog";
+        for (String k : kandidat) {
+            if (tersedia.contains(k)) {
+                pilihan = k;
+                break;
+            }
+        }
+        UI_FONT = pilihan;
+    }
+
     private DesignUtil() {
+    }
+
+    /** Judul laporan: di tengah, HURUF BESAR, bold. Dipakai semua panel laporan. */
+    public static void styleJudulLaporan(JLabel label, String judul) {
+        label.setText(judul.toUpperCase(java.util.Locale.ROOT));
+        label.setFont(new Font(UI_FONT, Font.BOLD, 24));
+        label.setForeground(WARNA_JUDUL);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    /** Tombol laporan dengan warna seragam di seluruh panel. */
+    public static void styleFilledButton(JButton button, Color bg, Color fg) {
+        button.setUI(new BasicButtonUI());
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setOpaque(true);
+        button.setContentAreaFilled(true);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setFont(new Font(UI_FONT, Font.BOLD, 12));
+        button.setBorder(BorderFactory.createEmptyBorder(7, 16, 7, 16));
     }
 
     public static void applyPage(JPanel panel) {
         panel.setBackground(PAGE_BG);
-        panel.setPreferredSize(new Dimension(1120, 660));
-        panel.setMinimumSize(new Dimension(900, 560));
+        // JANGAN kunci ukuran page: biarkan layout manager yang mengatur supaya
+        // panel ikut melar (full) saat window di-maximize.
         panel.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
         applyComponent(panel);
+        // bersihkan sisa preferred-size kaku pada anak-anak panel
+        longgar(panel);
+    }
+
+    /**
+     * Hapus preferred/minimum size kaku yang di-set oleh generated code Form NetBeans
+     * (contoh nyata: pnlUtama 1000x650, pnlForm 300x430, bahkan setPreferredSize 5437x993)
+     * supaya komponen ikut melebar penuh.
+     */
+    public static void longgar(java.awt.Container container) {
+        for (Component child : container.getComponents()) {
+            if (child instanceof JComponent) {
+                JComponent jc = (JComponent) child;
+                // jangan ganggu tombol (punya ukuran tombol yang memang pas)
+                if (!(jc instanceof JButton)
+                        && !(jc instanceof JTextField)
+                        && !(jc instanceof JComboBox)
+                        && !(jc instanceof JTextArea)) {
+                    jc.setMinimumSize(null);
+                    Dimension pref = jc.getPreferredSize();
+                    if (pref != null && pref.width > 1400) {
+                        // buang preferred size yang tidak wajar (mis. 5437 px)
+                        jc.setPreferredSize(null);
+                    }
+                }
+            }
+            if (child instanceof java.awt.Container) {
+                longgar((java.awt.Container) child);
+            }
+        }
     }
 
     private static void applyComponent(Component component) {
@@ -49,7 +125,7 @@ public final class DesignUtil {
             if (panel.getBorder() instanceof TitledBorder) {
                 TitledBorder border = (TitledBorder) panel.getBorder();
                 border.setTitleColor(PRIMARY);
-                border.setTitleFont(new Font("Segoe UI", Font.BOLD, 13));
+                border.setTitleFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 13));
                 panel.setBorder(BorderFactory.createTitledBorder(
                         BorderFactory.createLineBorder(LINE),
                         border.getTitle(),
@@ -77,10 +153,7 @@ public final class DesignUtil {
         } else if (component instanceof JTextArea) {
             styleInput((JTextArea) component);
         } else if (component instanceof JComboBox) {
-            component.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            component.setForeground(TEXT);
-            ((JComboBox) component).setPreferredSize(new Dimension(
-                    Math.max(140, component.getPreferredSize().width), 32));
+            styleCombo((JComboBox<?>) component);
         }
 
         if (component instanceof java.awt.Container) {
@@ -92,7 +165,7 @@ public final class DesignUtil {
 
     private static void styleLabel(JLabel label) {
         String text = label.getText() == null ? "" : label.getText();
-        label.setFont(new Font("Segoe UI", isTitle(text) ? Font.BOLD : Font.PLAIN, isTitle(text) ? 24 : 13));
+        label.setFont(new Font(util.DesignUtil.UI_FONT, isTitle(text) ? Font.BOLD : Font.PLAIN, isTitle(text) ? 24 : 13));
         label.setForeground(isTitle(text) ? PRIMARY : MUTED);
     }
 
@@ -112,7 +185,7 @@ public final class DesignUtil {
         button.setContentAreaFilled(true);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        button.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 13));
         button.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
         button.setPreferredSize(new Dimension(Math.max(92, button.getPreferredSize().width), 36));
         button.setMinimumSize(new Dimension(92, 34));
@@ -136,7 +209,7 @@ public final class DesignUtil {
     }
 
     public static void applyTable(JTable table) {
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        table.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 12));
         table.setForeground(TEXT);
         table.setRowHeight(23);
         table.setGridColor(LINE);
@@ -160,7 +233,7 @@ public final class DesignUtil {
 
         JTableHeader header = table.getTableHeader();
         if (header != null) {
-            header.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            header.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 12));
             header.setForeground(Color.WHITE);
             header.setBackground(PRIMARY);
             header.setOpaque(true);
@@ -212,7 +285,7 @@ public final class DesignUtil {
                 boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setText(value == null ? "" : value.toString());
-            setFont(new Font("Segoe UI", Font.BOLD, 12));
+            setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 12));
             setForeground(Color.WHITE);
             setBackground(PRIMARY);
             return this;
@@ -228,7 +301,7 @@ public final class DesignUtil {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 12));
             setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
             if (isIdColumn(table, column)) {
                 setHorizontalAlignment(SwingConstants.CENTER);
@@ -268,13 +341,51 @@ public final class DesignUtil {
     }
 
     private static void styleInput(JComponent input) {
-        input.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        input.setFont(new Font(UI_FONT, Font.PLAIN, 13));
         input.setForeground(TEXT);
         input.setBackground(Color.WHITE);
-        input.setPreferredSize(new Dimension(Math.max(120, input.getPreferredSize().width), 32));
+        // caret hanya ada pada text component (JTextField/JTextArea/JTextPane)
+        if (input instanceof javax.swing.text.JTextComponent) {
+            ((javax.swing.text.JTextComponent) input).setCaretColor(TEXT);
+        }
+        input.setPreferredSize(new Dimension(Math.max(120, input.getPreferredSize().width), 34));
         input.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(190, 198, 208)),
-                BorderFactory.createEmptyBorder(4, 8, 4, 8)
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
+    }
+
+    /**
+     * Dropdown/combobox yang rapi: tinggi lega, ada padding, warna teks & background
+     * dipaksa konsisten (sebelumnya tampak "jelek" karena GTK L&F + ukuran 32 px sempit).
+     */
+    public static void styleCombo(JComboBox<?> combo) {
+        combo.setFont(new Font(UI_FONT, Font.PLAIN, 13));
+        combo.setForeground(TEXT);
+        combo.setBackground(Color.WHITE);
+        combo.setOpaque(true);
+        combo.setPreferredSize(new Dimension(Math.max(150, combo.getPreferredSize().width), 34));
+        combo.setMinimumSize(new Dimension(120, 34));
+        combo.setBorder(BorderFactory.createLineBorder(new Color(190, 198, 208)));
+        combo.setRenderer(new ComboRenderer());
+    }
+
+    private static final class ComboRenderer extends javax.swing.DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(javax.swing.JList<?> list, Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            setFont(new Font(UI_FONT, Font.PLAIN, 13));
+            setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+            setText(value == null ? "" : value.toString());
+            if (isSelected) {
+                setBackground(PRIMARY);
+                setForeground(Color.WHITE);
+            } else {
+                setBackground(Color.WHITE);
+                setForeground(TEXT);
+            }
+            return this;
+        }
     }
 }

@@ -41,9 +41,11 @@ public class DashboardFrame extends JFrame {
         JScrollPane contentScroll = new JScrollPane(contentPanel);
         contentScroll.setBorder(BorderFactory.createEmptyBorder());
         contentScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        contentScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        // horizontal: NEVER supaya panel konten melar penuh mengikuti lebar window
+        // (dulu AS_NEEDED membuat konten terpotong / ada scrollbar horizontal)
+        contentScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         contentScroll.getVerticalScrollBar().setUnitIncrement(16);
-        contentScroll.getHorizontalScrollBar().setUnitIncrement(16);
+        contentScroll.getViewport().setBackground(new Color(244, 247, 250));
 
         add(sidebarScroll, BorderLayout.WEST);
         add(contentScroll, BorderLayout.CENTER);

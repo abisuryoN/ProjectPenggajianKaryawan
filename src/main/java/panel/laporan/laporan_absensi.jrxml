@@ -11,7 +11,8 @@
     <parameter name="id_karyawan" class="java.lang.Integer"/>
     <parameter name="status" class="java.lang.String"><defaultValueExpression><![CDATA[""]]></defaultValueExpression></parameter>
     <parameter name="keyword" class="java.lang.String"><defaultValueExpression><![CDATA[""]]></defaultValueExpression></parameter>
-    <queryString language="SQL">
+        <parameter name="tanggal_cetak" class="java.lang.String"><defaultValueExpression><![CDATA[""]]></defaultValueExpression></parameter>
+<queryString language="SQL">
         <![CDATA[SELECT COALESCE(k.nama_karyawan, CONCAT('ID ', a.id_karyawan)) AS nama_karyawan,
        a.tanggal, a.jam_masuk, a.jam_pulang, a.status,
        COALESCE(a.keterangan, '') AS keterangan
@@ -56,8 +57,9 @@ ORDER BY a.tanggal DESC, a.id_absensi DESC]]>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="14" isBold="true"/></textElement>
                 <text><![CDATA[LAPORAN ABSENSI KARYAWAN]]></text>
             </staticText>
+        
         </band>
-    </title>
+</title>
     <columnHeader>
         <band height="20">
             <staticText><reportElement x="0" y="0" width="40" height="20" uuid="05383246-2549-4429-be1c-9fea95f5f3a3"/><box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement><text><![CDATA[No]]></text></staticText>
@@ -99,7 +101,7 @@ ORDER BY a.tanggal DESC, a.id_absensi DESC]]>
             <textField>
                 <reportElement x="0" y="0" width="300" height="18" uuid="b2b5865f-7b0d-4b44-b77f-17163bf3a970"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="SansSerif" size="8"/></textElement>
-                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+                <textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement x="602" y="0" width="150" height="18" uuid="73972f43-14bb-47ff-9ace-b5182af86173"/>
@@ -114,34 +116,39 @@ ORDER BY a.tanggal DESC, a.id_absensi DESC]]>
         </band>
     </pageFooter>
     <summary>
-        <band height="110">
+        <band height="138">
+            <textField>
+                <reportElement x="552" y="28" width="200" height="16" uuid="8dd725f6-26df-4358-ae3b-6855cf054e38"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
+                <textFieldExpression><![CDATA["Bogor, " + new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression>
+            </textField>
             <staticText>
-                <reportElement x="40" y="10" width="180" height="16" uuid="8d84f360-eb96-4fd0-bd13-72c9f0ba5a13"/>
+                <reportElement x="40" y="38" width="180" height="16" uuid="8d84f360-eb96-4fd0-bd13-72c9f0ba5a13"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
                 <text><![CDATA[Mengetahui,]]></text>
             </staticText>
             <staticText>
-                <reportElement x="40" y="26" width="180" height="16" uuid="bb32e2b1-e7cc-4bb7-bbfd-75f59328183e"/>
+                <reportElement x="40" y="54" width="180" height="16" uuid="bb32e2b1-e7cc-4bb7-bbfd-75f59328183e"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement>
                 <text><![CDATA[HRD]]></text>
             </staticText>
             <staticText>
-                <reportElement x="40" y="72" width="180" height="16" uuid="7a0a3cef-dd6f-4ce2-bc54-7bd4678b259f"/>
+                <reportElement x="40" y="100" width="180" height="16" uuid="7a0a3cef-dd6f-4ce2-bc54-7bd4678b259f"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
                 <text><![CDATA[( _________________________ )]]></text>
             </staticText>
             <staticText>
-                <reportElement x="552" y="10" width="200" height="16" uuid="cac4bfc1-e5fa-419d-ad28-ab14e23e3fbd"/>
+                <reportElement x="552" y="46" width="200" height="16" uuid="cac4bfc1-e5fa-419d-ad28-ab14e23e3fbd"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
                 <text><![CDATA[Menyetujui,]]></text>
             </staticText>
             <staticText>
-                <reportElement x="552" y="26" width="200" height="16" uuid="77436c05-dac7-4148-a286-414b2c864f58"/>
+                <reportElement x="552" y="62" width="200" height="16" uuid="77436c05-dac7-4148-a286-414b2c864f58"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10" isBold="true"/></textElement>
                 <text><![CDATA[Direktur / Pimpinan]]></text>
             </staticText>
             <staticText>
-                <reportElement x="552" y="72" width="200" height="16" uuid="8fb4106b-fd54-4738-864f-c9da69e89f44"/>
+                <reportElement x="552" y="108" width="200" height="16" uuid="8fb4106b-fd54-4738-864f-c9da69e89f44"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="SansSerif" size="10"/></textElement>
                 <text><![CDATA[( _________________________ )]]></text>
             </staticText>

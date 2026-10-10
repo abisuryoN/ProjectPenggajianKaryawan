@@ -53,15 +53,15 @@ public class HomeKaryawanPanel extends JPanel {
         text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel("Dashboard Karyawan");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 28));
         title.setForeground(new Color(22, 48, 92));
 
         JLabel welcome = new JLabel("Selamat datang, " + util.Session.getNamaKaryawan());
-        welcome.setFont(new Font("Segoe UI", Font.PLAIN, 17));
+        welcome.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 17));
         welcome.setForeground(new Color(84, 96, 110));
 
         JLabel desc = new JLabel("Pantau absensi, riwayat kehadiran, dan slip gaji Anda dari dashboard ini.");
-        desc.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        desc.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 14));
         desc.setForeground(new Color(110, 118, 128));
 
         text.add(title);
@@ -93,11 +93,11 @@ public class HomeKaryawanPanel extends JPanel {
         ));
 
         JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblTitle.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 13));
         lblTitle.setForeground(new Color(115, 123, 132));
 
         JLabel lblValue = new JLabel(value);
-        lblValue.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblValue.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 24));
         lblValue.setForeground(new Color(35, 47, 62));
 
         card.add(lblTitle, BorderLayout.NORTH);
@@ -114,14 +114,14 @@ public class HomeKaryawanPanel extends JPanel {
         ));
 
         JLabel title = new JLabel("Informasi Saya");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        title.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 18));
         title.setForeground(new Color(35, 47, 62));
         card.add(title, BorderLayout.NORTH);
 
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setOpaque(false);
-        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        textArea.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 14));
         textArea.setForeground(new Color(95, 104, 114));
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);

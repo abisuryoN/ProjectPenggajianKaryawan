@@ -18,6 +18,21 @@ import javax.swing.table.DefaultTableModel;
  */
 public class LaporanKaryawanPanel extends javax.swing.JPanel {
 
+    /** Judul panel (tanpa style), dipakai untuk header & judul di layar. */
+    private String judulLaporan() {
+        return "Laporan Karyawan";
+    }
+
+    /** Tanggal cetak format Indonesia, mengikuti hari saat laporan dicetak. */
+    private static String tanggalCetakIndonesia() {
+        java.time.LocalDate t = java.time.LocalDate.now();
+        String[] hari = {"", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"};
+        String[] bulan = {"", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+        return hari[t.getDayOfWeek().getValue()] + ", " + t.getDayOfMonth() + " "
+                + bulan[t.getMonthValue()] + " " + t.getYear();
+    }
+
     public LaporanKaryawanPanel() {
     initComponents();
     rebuildLayout();
@@ -41,10 +56,17 @@ private void rebuildLayout() {
 
     JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
     titlePanel.setOpaque(false);
+    jLabel1.setText(judulLaporan().toUpperCase(java.util.Locale.ROOT));
+    jLabel1.setFont(new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 24));
+    jLabel1.setForeground(util.DesignUtil.WARNA_JUDUL);
+    jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     titlePanel.add(jLabel1);
 
     JPanel searchPanel = new JPanel(new BorderLayout(12, 0));
-    searchPanel.setBorder(BorderFactory.createTitledBorder("Filter Data"));
+    searchPanel.setBorder(BorderFactory.createTitledBorder(null, "Filter Data",
+            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.DEFAULT_POSITION,
+            new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 12), new java.awt.Color(22, 48, 92)));
     txtCari.setPreferredSize(new Dimension(280, 34));
     searchPanel.add(jLabel9, BorderLayout.WEST);
     searchPanel.add(txtCari, BorderLayout.CENTER);
@@ -62,7 +84,10 @@ private void rebuildLayout() {
     topPanel.add(searchPanel, BorderLayout.CENTER);
     topPanel.add(buttonPanel, BorderLayout.EAST);
 
-    jPanel2.setBorder(BorderFactory.createTitledBorder("Data Karyawan"));
+    jPanel2.setBorder(BorderFactory.createTitledBorder(null, "Data Karyawan",
+            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.DEFAULT_POSITION,
+            new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 12), new java.awt.Color(22, 48, 92)));
     jPanel2.removeAll();
     jPanel2.setLayout(new BorderLayout());
     jScrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -79,11 +104,11 @@ private void rebuildLayout() {
 }
     
     private void styleButton() {
-    styleFilledButton(btnCari, new java.awt.Color(37, 99, 235), java.awt.Color.WHITE);
-    styleFilledButton(btnExportPDF, new java.awt.Color(20, 184, 166), java.awt.Color.WHITE);
-    styleFilledButton(btncetak, new java.awt.Color(37, 99, 235), java.awt.Color.WHITE);
-    styleFilledButton(btnReset, new java.awt.Color(239, 68, 68), java.awt.Color.WHITE);
-    styleFilledButton(btnRefresh, new java.awt.Color(243, 244, 246), new java.awt.Color(17, 24, 39));
+    util.DesignUtil.styleFilledButton(btnCari, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnExportPDF, util.DesignUtil.TOMBOL_SEKUNDER, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btncetak, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnReset, util.DesignUtil.TOMBOL_BAHAYA, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnRefresh, util.DesignUtil.TOMBOL_NETRAL, util.DesignUtil.TEKS_GELAP);
 }
 
 private void styleFilledButton(javax.swing.JButton button, java.awt.Color bg, java.awt.Color fg) {
@@ -213,7 +238,7 @@ private void exportPDF() {
         doc.add(judul);
 
         com.itextpdf.text.Paragraph tgl = new com.itextpdf.text.Paragraph(
-            "Dicetak: " + java.time.LocalDate.now(),
+            "Dicetak: " + tanggalCetakIndonesia(),
             new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10));
         tgl.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
         doc.add(tgl);
@@ -258,7 +283,9 @@ private void exportPDF() {
 
 private void cetakLaporanJasper() {
     try {
-        util.ReportUtil.showReport("laporan_karyawan", new java.util.HashMap<String, Object>());
+        java.util.Map<String, Object> params = new java.util.HashMap<>();
+        params.put("tanggal_cetak", tanggalCetakIndonesia());
+        util.ReportUtil.showReport("laporan_karyawan", params);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal membuka laporan karyawan: " + e.getMessage());
     }
@@ -286,10 +313,10 @@ private void cetakLaporanJasper() {
         jLabel1 = new javax.swing.JLabel();
         btnCari = new javax.swing.JButton();
 
-        btnRefresh.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
+        btnRefresh.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnRefresh.setText("Refresh");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Absensi", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("sansserif", 3, 12), new java.awt.Color(0, 153, 153))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Karyawan", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 12), new java.awt.Color(22, 48, 92))); // NOI18N
 
         tblAbsensi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -321,19 +348,19 @@ private void cetakLaporanJasper() {
                 .addContainerGap(29, Short.MAX_VALUE))
         );
 
-        btnReset.setBackground(new java.awt.Color(255, 0, 0));
+        btnReset.setBackground(new java.awt.Color(245, 245, 245));
         btnReset.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnReset.setText("Reset");
 
-        btnExportPDF.setBackground(new java.awt.Color(0, 255, 204));
+        btnExportPDF.setBackground(new java.awt.Color(13, 71, 161));
         btnExportPDF.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnExportPDF.setText("Export PDF");
 
-        btncetak.setBackground(new java.awt.Color(51, 153, 255));
+        btncetak.setBackground(new java.awt.Color(13, 71, 161));
         btncetak.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btncetak.setText("Cetak");
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(null, "Input", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("sansserif", 1, 12), new java.awt.Color(0, 153, 153)), "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 16), new java.awt.Color(0, 153, 153))); // NOI18N
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cari Data", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 12), new java.awt.Color(22, 48, 92))); // NOI18N
 
         jLabel9.setText("Cari Nama / NIK / Divisi");
 
@@ -358,11 +385,11 @@ private void cetakLaporanJasper() {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel1.setFont(new java.awt.Font("Franklin Gothic Medium", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 102, 153));
-        jLabel1.setText("LAPORAN KARYAWAN");
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(13, 71, 161));
+        jLabel1.setText("Laporan Karyawan");
 
-        btnCari.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
+        btnCari.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnCari.setText("Cari");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);

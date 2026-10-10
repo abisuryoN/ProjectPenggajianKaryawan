@@ -55,15 +55,15 @@ public class HomeHRDPanel extends JPanel {
         text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel("Dashboard HRD");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 28));
         title.setForeground(new Color(22, 48, 92));
 
         JLabel welcome = new JLabel("Selamat datang, " + Session.getNama());
-        welcome.setFont(new Font("Segoe UI", Font.PLAIN, 17));
+        welcome.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 17));
         welcome.setForeground(new Color(84, 96, 110));
 
         JLabel desc = new JLabel("Kelola master data, transaksi absensi, penggajian, dan laporan dari satu dashboard.");
-        desc.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        desc.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 14));
         desc.setForeground(new Color(110, 118, 128));
 
         text.add(title);
@@ -102,11 +102,11 @@ public class HomeHRDPanel extends JPanel {
         dot.setPreferredSize(new Dimension(14, 14));
 
         JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblTitle.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 13));
         lblTitle.setForeground(new Color(115, 123, 132));
 
         JLabel lblValue = new JLabel(value);
-        lblValue.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblValue.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 24));
         lblValue.setForeground(new Color(35, 47, 62));
 
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -138,7 +138,7 @@ public class HomeHRDPanel extends JPanel {
     ));
 
     JLabel title = new JLabel("Akses Cepat");
-    title.setFont(new Font("Segoe UI", Font.BOLD, 18));
+    title.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 18));
     title.setForeground(new Color(35, 47, 62));
     card.add(title, BorderLayout.NORTH);
 
@@ -173,7 +173,7 @@ public class HomeHRDPanel extends JPanel {
         button.setFocusPainted(false);
         button.setBackground(new Color(245, 247, 251));
         button.setForeground(new Color(32, 48, 76));
-        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        button.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 13));
         button.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(214, 221, 229)),
                 BorderFactory.createEmptyBorder(14, 12, 14, 12)
@@ -190,7 +190,7 @@ public class HomeHRDPanel extends JPanel {
     ));
 
     JLabel title = new JLabel("Ringkasan Aktivitas");
-    title.setFont(new Font("Segoe UI", Font.BOLD, 18));
+    title.setFont(new Font(util.DesignUtil.UI_FONT, Font.BOLD, 18));
     title.setForeground(new Color(35, 47, 62));
     card.add(title, BorderLayout.NORTH);
 
@@ -200,7 +200,7 @@ public class HomeHRDPanel extends JPanel {
     JTextArea textArea = new JTextArea();
     textArea.setEditable(false);
     textArea.setOpaque(false);
-    textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    textArea.setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 14));
     textArea.setForeground(new Color(95, 104, 114));
     textArea.setLineWrap(true);
     textArea.setWrapStyleWord(true);

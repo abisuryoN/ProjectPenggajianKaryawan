@@ -14,26 +14,113 @@ import javax.swing.table.DefaultTableModel;
  */
 public class LaporanGajiPanel extends javax.swing.JPanel {
 
-  public LaporanGajiPanel() {
+  /** Tanggal cetak format Indonesia, mengikuti hari saat laporan dicetak. */
+    private static String tanggalCetakIndonesia() {
+        java.time.LocalDate t = java.time.LocalDate.now();
+        String[] hari = {"", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"};
+        String[] bulan = {"", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+        return hari[t.getDayOfWeek().getValue()] + ", " + t.getDayOfMonth() + " "
+                + bulan[t.getMonthValue()] + " " + t.getYear();
+    }
+
+    public LaporanGajiPanel() {
     initComponents();
+    rebuildLayout();
     styleButton();
     loadKaryawan();
     loadBulan();
     tampilData();
     txtTahun.setText(String.valueOf(java.time.LocalDate.now().getYear()));
     util.DesignUtil.applyPage(this);
-    
+
     cmbKaryawan.setVisible(false);
     jLabel5.setVisible(false);
+
+    btnFilter.addActionListener(e -> filterData());
+    btnRefresh.addActionListener(e -> tampilData());
+    btnReset.addActionListener(e -> {
+        cmbKaryawan.setSelectedIndex(0);
+        cmbBulan.setSelectedIndex(0);
+        txtCari.setText("");
+        txtTahun.setText(String.valueOf(java.time.LocalDate.now().getYear()));
+        tampilData();
+    });
+    btnCetak.addActionListener(e -> cetakLaporanJasper());
+    btnExportPDF.addActionListener(e -> cetakLaporanJasper());
+    cmbBulan.addActionListener(e -> filterData());
+    tblLaporanGaji.setDefaultEditor(Object.class, null);
+    tblLaporanGaji.getTableHeader().setReorderingAllowed(false);
+}
+
+/** Susun ulang layout mengikuti gaya Laporan Karyawan: judul tengah + filter + tabel penuh. */
+private void rebuildLayout() {
+    removeAll();
+    setLayout(new java.awt.BorderLayout(0, 14));
+
+    javax.swing.JPanel titlePanel = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 8));
+    titlePanel.setOpaque(false);
+    util.DesignUtil.styleJudulLaporan(jLabel1, judulLaporan());
+    titlePanel.add(jLabel1);
+
+    javax.swing.JPanel filter = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 6));
+    filter.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filter Data",
+            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.DEFAULT_POSITION,
+            new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 12),
+            new java.awt.Color(22, 48, 92)));
+    jLabel5.setVisible(false);
+    cmbKaryawan.setVisible(false);
+    cmbBulan.setPreferredSize(new java.awt.Dimension(150, 32));
+    txtTahun.setPreferredSize(new java.awt.Dimension(80, 32));
+    txtCari.setPreferredSize(new java.awt.Dimension(220, 32));
+    filter.add(jLabel6); filter.add(cmbBulan);
+    filter.add(jLabel8); filter.add(txtTahun);
+    filter.add(jLabel7); filter.add(txtCari);
+    filter.add(btnFilter); filter.add(btnReset);
+
+    javax.swing.JPanel btnPanel = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 0));
+    btnPanel.setOpaque(false);
+    btnPanel.add(btnCetak);
+    btnPanel.add(btnCetakSlip);
+    btnPanel.add(btnExportPDF);
+    btnPanel.add(btnRefresh);
+
+    javax.swing.JPanel topPanel = new javax.swing.JPanel(new java.awt.BorderLayout(16, 8));
+    topPanel.setOpaque(false);
+    topPanel.add(filter, java.awt.BorderLayout.CENTER);
+    topPanel.add(btnPanel, java.awt.BorderLayout.SOUTH);
+
+    javax.swing.JPanel tabelPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
+    tabelPanel.setOpaque(false);
+    tabelPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Laporan Gaji",
+            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.DEFAULT_POSITION,
+            new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 12),
+            new java.awt.Color(22, 48, 92)));
+    scrollLaporanGaji.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    tabelPanel.add(scrollLaporanGaji, java.awt.BorderLayout.CENTER);
+
+    javax.swing.JPanel content = new javax.swing.JPanel(new java.awt.BorderLayout(0, 12));
+    content.setOpaque(false);
+    content.add(topPanel, java.awt.BorderLayout.NORTH);
+    content.add(tabelPanel, java.awt.BorderLayout.CENTER);
+
+    add(titlePanel, java.awt.BorderLayout.NORTH);
+    add(content, java.awt.BorderLayout.CENTER);
+}
+
+private String judulLaporan() {
+    return "Laporan Gaji Karyawan";
 }
   
   private void styleButton() {
-    styleFilledButton(btnCetak, new java.awt.Color(34, 197, 94), java.awt.Color.WHITE);
-    styleFilledButton(btnCetakSlip, new java.awt.Color(37, 99, 235), java.awt.Color.WHITE);
-    styleFilledButton(btnExportPDF, new java.awt.Color(239, 68, 68), java.awt.Color.WHITE);
-    styleFilledButton(btnRefresh, new java.awt.Color(249, 115, 22), java.awt.Color.WHITE);
-    styleFilledButton(btnFilter, new java.awt.Color(14, 165, 164), java.awt.Color.WHITE);
-    styleFilledButton(btnReset, new java.awt.Color(107, 114, 128), java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnCetak, util.DesignUtil.TOMBOL_SEKUNDER, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnCetakSlip, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnExportPDF, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnRefresh, util.DesignUtil.TOMBOL_NETRAL, util.DesignUtil.TEKS_GELAP);
+    util.DesignUtil.styleFilledButton(btnFilter, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+    util.DesignUtil.styleFilledButton(btnReset, util.DesignUtil.TOMBOL_BAHAYA, java.awt.Color.WHITE);
 }
 
 private void styleFilledButton(javax.swing.JButton button, java.awt.Color bg, java.awt.Color fg) {
@@ -234,7 +321,7 @@ private void exportPDF() {
         doc.add(judul);
 
         com.itextpdf.text.Paragraph tgl = new com.itextpdf.text.Paragraph(
-            "Dicetak: " + java.time.LocalDate.now(),
+            "Dicetak: " + tanggalCetakIndonesia(),
             new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 10));
         tgl.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
         doc.add(tgl);
@@ -285,6 +372,7 @@ private void cetakLaporanJasper() {
         params.put("bulan", cmbBulan.getSelectedIndex() > 0
                 ? String.format("%02d", cmbBulan.getSelectedIndex())
                 : null);
+        params.put("tanggal_cetak", tanggalCetakIndonesia());
         util.ReportUtil.showReport("laporan_penggajian", params);
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal membuka laporan penggajian: " + e.getMessage());
@@ -329,9 +417,9 @@ private void cetakLaporanJasper() {
         scrollLaporanGaji = new javax.swing.JScrollPane();
         tblLaporanGaji = new javax.swing.JTable();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 226, 235)));
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Filter Data"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filter Data", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(13, 71, 161))); // NOI18N
 
         jLabel2.setText("Tanggal Awal");
 
@@ -369,7 +457,7 @@ private void cetakLaporanJasper() {
                 .addContainerGap(40, Short.MAX_VALUE))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("AKSI"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Aksi", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(13, 71, 161))); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -382,7 +470,7 @@ private void cetakLaporanJasper() {
             .addGap(0, 28, Short.MAX_VALUE)
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("DATA LAPORAN ABSENSI"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Laporan Absensi", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(13, 71, 161))); // NOI18N
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -419,12 +507,12 @@ private void cetakLaporanJasper() {
                 .addContainerGap())
         );
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setText("LAPORAN GAJI KARYAWAN");
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setText("Laporan Gaji Karyawan");
 
         pnlUtama.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        pnlHeader.setBorder(javax.swing.BorderFactory.createTitledBorder("FILTER DATA"));
+        pnlHeader.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filter Data", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(13, 71, 161))); // NOI18N
 
         jLabel5.setText("Nama Karyawan");
 
@@ -432,7 +520,7 @@ private void cetakLaporanJasper() {
 
         jLabel7.setText("Cari Data");
 
-        cmbKaryawan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Izzy jomok", "Hasan ", "Abi GAY", "Zaidan ", "Egi" }));
+        cmbKaryawan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- Semua Karyawan --" }));
 
         cmbBulan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari ", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
 
@@ -514,7 +602,7 @@ private void cetakLaporanJasper() {
                 .addContainerGap(28, Short.MAX_VALUE))
         );
 
-        pnlFilter.setBorder(javax.swing.BorderFactory.createTitledBorder("AKSI"));
+        pnlFilter.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Aksi", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(13, 71, 161))); // NOI18N
 
         btnCetak.setBackground(new java.awt.Color(51, 204, 0));
         btnCetak.setForeground(new java.awt.Color(255, 255, 255));
@@ -578,7 +666,7 @@ private void cetakLaporanJasper() {
                 .addContainerGap())
         );
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("DATA LAPORAN GAJI"));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Laporan Gaji", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(13, 71, 161))); // NOI18N
 
         scrollLaporanGaji.setBorder(null);
         scrollLaporanGaji.setToolTipText("");
@@ -651,7 +739,7 @@ private void cetakLaporanJasper() {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(26, 26, 26)
-                .addComponent(pnlUtama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlUtama, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap(29, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)

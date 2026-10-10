@@ -394,9 +394,12 @@ private void ambilDataDariTabel() {
         cmbJabatan = new javax.swing.JComboBox<>();
         cmbDivisi = new javax.swing.JComboBox<>();
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        btnCari.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnCari.setBackground(new java.awt.Color(229, 231, 235)); // NOI18N
+        btnCari.setForeground(new java.awt.Color(17, 24, 39)); // NOI18N
+        btnCari.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnCari.setPreferredSize(new java.awt.Dimension(110, 36));
         btnCari.setText("Cari");
         btnCari.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -417,7 +420,10 @@ private void ambilDataDariTabel() {
         ));
         jScrollPane1.setViewportView(tblKaryawan);
 
-        btnRefresh.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnRefresh.setBackground(new java.awt.Color(229, 231, 235)); // NOI18N
+        btnRefresh.setForeground(new java.awt.Color(17, 24, 39)); // NOI18N
+        btnRefresh.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnRefresh.setPreferredSize(new java.awt.Dimension(110, 36));
         btnRefresh.setText("Refresh");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -456,10 +462,10 @@ private void ambilDataDariTabel() {
         );
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 51, 102));
+        jLabel1.setForeground(new java.awt.Color(18, 40, 90));
         jLabel1.setText("Data Karyawan");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Form Karyawan", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 12), new java.awt.Color(0, 51, 102))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 226, 235))); // NOI18N
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel5.setText("Nama Karyawan");
@@ -481,7 +487,10 @@ private void ambilDataDariTabel() {
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel7.setText("Password");
 
-        btnReset.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnReset.setBackground(new java.awt.Color(229, 231, 235)); // NOI18N
+        btnReset.setForeground(new java.awt.Color(17, 24, 39)); // NOI18N
+        btnReset.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnReset.setPreferredSize(new java.awt.Dimension(110, 36));
         btnReset.setText("Reset");
         btnReset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -489,8 +498,9 @@ private void ambilDataDariTabel() {
             }
         });
 
-        btnHapus.setBackground(new java.awt.Color(255, 51, 51));
-        btnHapus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnHapus.setBackground(new java.awt.Color(239, 68, 68));
+        btnHapus.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnHapus.setPreferredSize(new java.awt.Dimension(110, 36));
         btnHapus.setForeground(new java.awt.Color(255, 255, 255));
         btnHapus.setText("Hapus");
         btnHapus.addActionListener(new java.awt.event.ActionListener() {
@@ -499,8 +509,9 @@ private void ambilDataDariTabel() {
             }
         });
 
-        btnUbah.setBackground(new java.awt.Color(102, 102, 255));
-        btnUbah.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnUbah.setBackground(new java.awt.Color(37, 99, 235));
+        btnUbah.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnUbah.setPreferredSize(new java.awt.Dimension(110, 36));
         btnUbah.setForeground(new java.awt.Color(255, 255, 255));
         btnUbah.setText("Ubah");
         btnUbah.addActionListener(new java.awt.event.ActionListener() {
@@ -509,8 +520,9 @@ private void ambilDataDariTabel() {
             }
         });
 
-        btnSimpan.setBackground(new java.awt.Color(51, 255, 204));
-        btnSimpan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSimpan.setBackground(new java.awt.Color(20, 184, 166));
+        btnSimpan.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnSimpan.setPreferredSize(new java.awt.Dimension(110, 36));
         btnSimpan.setForeground(new java.awt.Color(255, 255, 255));
         btnSimpan.setText("Simpan");
         btnSimpan.addActionListener(new java.awt.event.ActionListener() {
@@ -577,7 +589,7 @@ private void ambilDataDariTabel() {
                             .addComponent(txtIdKaryawan)
                             .addComponent(txtNik)
                             .addComponent(txtNamaKaryawan)
-                            .addComponent(cmbJenisKelamin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbJenisKelamin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cmbJabatan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cmbDivisi, 0, 578, Short.MAX_VALUE)
                             .addComponent(txtNoHp)))
@@ -605,7 +617,7 @@ private void ambilDataDariTabel() {
                     .addComponent(txtNamaKaryawan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbJenisKelamin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbJenisKelamin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -660,7 +672,7 @@ private void ambilDataDariTabel() {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap(14, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
