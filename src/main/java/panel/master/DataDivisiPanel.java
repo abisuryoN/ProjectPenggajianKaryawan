@@ -140,6 +140,12 @@ private void hapusData() {
 
     if (konfirmasi == JOptionPane.YES_OPTION) {
         try {
+            String penahan = cekPemakaianDivisi(idDivisi);
+            if (penahan != null) {
+                JOptionPane.showMessageDialog(this, penahan, "Tidak Bisa Dihapus", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             String sql = "DELETE FROM divisi WHERE id_divisi=?";
             Connection conn = Koneksi.getConnection();
             PreparedStatement pst = conn.prepareStatement(sql);
@@ -152,9 +158,42 @@ private void hapusData() {
             resetForm();
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Gagal menghapus data: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Gagal menghapus data: " + pesanHapusAman(e));
         }
     }
+}
+
+private String cekPemakaianDivisi(String idDivisi) {
+    try {
+        Connection conn = Koneksi.getConnection();
+        int jmlKaryawan = hitungBaris(conn, "SELECT COUNT(*) FROM karyawan WHERE id_divisi=?", idDivisi);
+        int jmlJabatan = hitungBaris(conn, "SELECT COUNT(*) FROM jabatan WHERE id_divisi=?", idDivisi);
+        if (jmlKaryawan > 0 || jmlJabatan > 0) {
+            StringBuilder sb = new StringBuilder("Divisi ini tidak bisa dihapus karena masih dipakai:\n");
+            if (jmlKaryawan > 0) sb.append("- ").append(jmlKaryawan).append(" data karyawan\n");
+            if (jmlJabatan > 0) sb.append("- ").append(jmlJabatan).append(" data jabatan\n");
+            sb.append("Pindahkan atau hapus data terkait dulu.");
+            return sb.toString();
+        }
+    } catch (Exception e) {
+        return "Gagal memeriksa data terkait: " + e.getMessage();
+    }
+    return null;
+}
+
+private int hitungBaris(Connection conn, String sql, String id) throws Exception {
+    PreparedStatement pst = conn.prepareStatement(sql);
+    pst.setString(1, id);
+    ResultSet rs = pst.executeQuery();
+    return rs.next() ? rs.getInt(1) : 0;
+}
+
+private String pesanHapusAman(Exception e) {
+    String msg = e.getMessage();
+    if (msg != null && (msg.contains("foreign key") || msg.contains("Cannot delete"))) {
+        return "Data masih dipakai di tabel lain, jadi tidak bisa dihapus.";
+    }
+    return msg;
 }
 
 private void cariData() {
@@ -218,14 +257,18 @@ private void resetForm() {
     txtNamaDivisi.requestFocus();
 }
 
+private String safe(Object v) {
+    return v == null ? "" : v.toString();
+}
+
 private void ambilDataDariTabel() {
     int baris = tblDivisi.getSelectedRow();
 
     if (baris >= 0) {
-        txtidDivisi.setText(tblDivisi.getValueAt(baris, 0).toString());
-        txtNamaDivisi.setText(tblDivisi.getValueAt(baris, 1).toString());
-        txtKepalaDivisi.setText(tblDivisi.getValueAt(baris, 2).toString());
-        txtKeterangan.setText(tblDivisi.getValueAt(baris, 3).toString());
+        txtidDivisi.setText(safe(tblDivisi.getValueAt(baris, 0)));
+        txtNamaDivisi.setText(safe(tblDivisi.getValueAt(baris, 1)));
+        txtKepalaDivisi.setText(safe(tblDivisi.getValueAt(baris, 2)));
+        txtKeterangan.setText(safe(tblDivisi.getValueAt(baris, 3)));
 
         jButton5.setEnabled(false);
         btnUbah.setEnabled(true);

@@ -126,6 +126,12 @@ public class DataJabatanPanel extends javax.swing.JPanel {
             return;
         }
 
+        String penahan = cekPemakaianJabatan(idJabatan);
+        if (penahan != null) {
+            JOptionPane.showMessageDialog(this, penahan, "Tidak Bisa Dihapus", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         int konfirmasi = JOptionPane.showConfirmDialog(this,
             "Yakin ingin menghapus jabatan ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
 
@@ -141,9 +147,42 @@ public class DataJabatanPanel extends javax.swing.JPanel {
                 tampilData();
                 resetForm();
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Gagal menghapus: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Gagal menghapus: " + pesanHapusAman(e));
             }
         }
+    }
+
+    private String cekPemakaianJabatan(String idJabatan) {
+        try {
+            Connection conn = Koneksi.getConnection();
+            int jmlKaryawan = hitungBaris(conn, "SELECT COUNT(*) FROM karyawan WHERE id_jabatan=?", idJabatan);
+            int jmlTunjangan = hitungBaris(conn, "SELECT COUNT(*) FROM tunjangan WHERE id_jabatan=?", idJabatan);
+            if (jmlKaryawan > 0 || jmlTunjangan > 0) {
+                StringBuilder sb = new StringBuilder("Jabatan ini tidak bisa dihapus karena masih dipakai:\n");
+                if (jmlKaryawan > 0) sb.append("- ").append(jmlKaryawan).append(" data karyawan\n");
+                if (jmlTunjangan > 0) sb.append("- ").append(jmlTunjangan).append(" data tunjangan\n");
+                sb.append("Pindahkan atau hapus data terkait dulu.");
+                return sb.toString();
+            }
+        } catch (Exception e) {
+            return "Gagal memeriksa data terkait: " + e.getMessage();
+        }
+        return null;
+    }
+
+    private int hitungBaris(Connection conn, String sql, String id) throws Exception {
+        PreparedStatement pst = conn.prepareStatement(sql);
+        pst.setString(1, id);
+        ResultSet rs = pst.executeQuery();
+        return rs.next() ? rs.getInt(1) : 0;
+    }
+
+    private String pesanHapusAman(Exception e) {
+        String msg = e.getMessage();
+        if (msg != null && (msg.contains("foreign key") || msg.contains("Cannot delete"))) {
+            return "Data masih dipakai di tabel lain, jadi tidak bisa dihapus.";
+        }
+        return msg;
     }
 
     private void resetForm() {
@@ -159,21 +198,24 @@ public class DataJabatanPanel extends javax.swing.JPanel {
     }
 
     // ✅ FIX: bersihkan format Rupiah sebelum isi txtGaji
+    private String safe(Object v) {
+        return v == null ? "" : v.toString();
+    }
+
     private void ambilDataDariTabel() {
         int baris = tblKaryawan.getSelectedRow();
         if (baris >= 0) {
-            txtIdJabatan.setText(tblKaryawan.getValueAt(baris, 0).toString());
-            txtNamaJabatan.setText(tblKaryawan.getValueAt(baris, 1).toString());
+            txtIdJabatan.setText(safe(tblKaryawan.getValueAt(baris, 0)));
+            txtNamaJabatan.setText(safe(tblKaryawan.getValueAt(baris, 1)));
 
-            String gajiRaw = tblKaryawan.getValueAt(baris, 2).toString()
+            String gajiRaw = safe(tblKaryawan.getValueAt(baris, 2))
                 .replace("Rp ", "")
                 .replace(".", "")
                 .replace(",", "")
                 .trim();
             txtGaji.setText(gajiRaw); // ✅ FIX: angka bersih tanpa "Rp"
 
-            txtKeterangan.setText(tblKaryawan.getValueAt(baris, 3) != null ?
-                tblKaryawan.getValueAt(baris, 3).toString() : "");
+            txtKeterangan.setText(safe(tblKaryawan.getValueAt(baris, 3)));
 
             btnSimpan.setEnabled(false);
             btnUbah.setEnabled(true);

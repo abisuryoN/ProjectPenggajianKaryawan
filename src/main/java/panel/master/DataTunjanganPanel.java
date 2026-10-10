@@ -281,7 +281,7 @@ private void cariData() {
             model.addRow(new Object[]{
                 rs.getString("id_tunjangan"),
                 rs.getString("nama_tunjangan"),
-                rs.getString("nominal"),
+                formatRupiah(rs.getString("nominal")),
                 rs.getString("nama_jabatan"),
                 rs.getString("keterangan")
             });
@@ -313,12 +313,16 @@ private void resetForm() {
     txtNamaTunjangan.requestFocus();
 }
 
-private void ambilDataDariTabel() {
+    private String safe(Object v) {
+        return v == null ? "" : v.toString();
+    }
+
+    private void ambilDataDariTabel() {
     int baris = tblTunjangan.getSelectedRow();
 
     if (baris >= 0) {
-        txtidTunjangan.setText(tblTunjangan.getValueAt(baris, 0).toString());
-        txtNamaTunjangan.setText(tblTunjangan.getValueAt(baris, 1).toString());
+        txtidTunjangan.setText(safe(tblTunjangan.getValueAt(baris, 0)));
+        txtNamaTunjangan.setText(safe(tblTunjangan.getValueAt(baris, 1)));
         
         // Ambil nominal asli dari database, bukan dari tabel yang sudah diformat
         try {
@@ -334,12 +338,10 @@ private void ambilDataDariTabel() {
             }
         } catch (Exception e) {}
 
-        String jabatan = tblTunjangan.getValueAt(baris, 3) != null ? 
-            tblTunjangan.getValueAt(baris, 3).toString() : "";
+        String jabatan = safe(tblTunjangan.getValueAt(baris, 3));
         cmbJabatan.setSelectedItem(jabatan);
 
-        txtKeterangan.setText(tblTunjangan.getValueAt(baris, 4) != null ? 
-            tblTunjangan.getValueAt(baris, 4).toString() : "");
+        txtKeterangan.setText(safe(tblTunjangan.getValueAt(baris, 4)));
 
         jButton5.setEnabled(false);
         btnUbah.setEnabled(true);

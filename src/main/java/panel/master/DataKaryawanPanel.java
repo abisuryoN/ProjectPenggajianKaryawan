@@ -234,6 +234,12 @@ private void hapusData() {
         return;
     }
 
+    String penahan = cekPemakaianKaryawan(idKaryawan);
+    if (penahan != null) {
+        JOptionPane.showMessageDialog(this, penahan, "Tidak Bisa Dihapus", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
     int konfirmasi = JOptionPane.showConfirmDialog(this,
         "Yakin ingin menghapus karyawan ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
 
@@ -254,9 +260,42 @@ private void hapusData() {
             tampilData();
             resetForm();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Gagal menghapus: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Gagal menghapus: " + pesanHapusAman(e));
         }
     }
+}
+
+private String cekPemakaianKaryawan(String idKaryawan) {
+    try {
+        Connection conn = Koneksi.getConnection();
+        int jmlAbsensi = hitungBaris(conn, "SELECT COUNT(*) FROM absensi WHERE id_karyawan=?", idKaryawan);
+        int jmlGaji = hitungBaris(conn, "SELECT COUNT(*) FROM penggajian WHERE id_karyawan=?", idKaryawan);
+        if (jmlAbsensi > 0 || jmlGaji > 0) {
+            StringBuilder sb = new StringBuilder("Karyawan ini tidak bisa dihapus karena masih dipakai:\n");
+            if (jmlAbsensi > 0) sb.append("- ").append(jmlAbsensi).append(" data absensi\n");
+            if (jmlGaji > 0) sb.append("- ").append(jmlGaji).append(" data penggajian\n");
+            sb.append("Hubungi HRD bila data terkaitnya memang harus dihapus dulu.");
+            return sb.toString();
+        }
+    } catch (Exception e) {
+        return "Gagal memeriksa data terkait: " + e.getMessage();
+    }
+    return null;
+}
+
+private int hitungBaris(Connection conn, String sql, String id) throws Exception {
+    PreparedStatement pst = conn.prepareStatement(sql);
+    pst.setString(1, id);
+    ResultSet rs = pst.executeQuery();
+    return rs.next() ? rs.getInt(1) : 0;
+}
+
+private String pesanHapusAman(Exception e) {
+    String msg = e.getMessage();
+    if (msg != null && (msg.contains("foreign key") || msg.contains("Cannot delete"))) {
+        return "Data masih dipakai di tabel lain, jadi tidak bisa dihapus.";
+    }
+    return msg;
 }
 
 private void cariData() {
@@ -325,16 +364,20 @@ private void resetForm() {
     btnHapus.setEnabled(false);
 }
 
+private String safe(Object v) {
+    return v == null ? "" : v.toString();
+}
+
 private void ambilDataDariTabel() {
     int baris = tblKaryawan.getSelectedRow();
     if (baris >= 0) {
-        txtIdKaryawan.setText(tblKaryawan.getValueAt(baris, 0).toString());
-        txtNik.setText(tblKaryawan.getValueAt(baris, 1).toString());
-        txtNamaKaryawan.setText(tblKaryawan.getValueAt(baris, 2).toString());
-        cmbJenisKelamin.setSelectedItem(tblKaryawan.getValueAt(baris, 3).toString());
-        txtNoHp.setText(tblKaryawan.getValueAt(baris, 4) != null ? tblKaryawan.getValueAt(baris, 4).toString() : "");
-        cmbJabatan.setSelectedItem(tblKaryawan.getValueAt(baris, 5) != null ? tblKaryawan.getValueAt(baris, 5).toString() : "");
-        cmbDivisi.setSelectedItem(tblKaryawan.getValueAt(baris, 6) != null ? tblKaryawan.getValueAt(baris, 6).toString() : "");
+        txtIdKaryawan.setText(safe(tblKaryawan.getValueAt(baris, 0)));
+        txtNik.setText(safe(tblKaryawan.getValueAt(baris, 1)));
+        txtNamaKaryawan.setText(safe(tblKaryawan.getValueAt(baris, 2)));
+        cmbJenisKelamin.setSelectedItem(safe(tblKaryawan.getValueAt(baris, 3)));
+        txtNoHp.setText(safe(tblKaryawan.getValueAt(baris, 4)));
+        cmbJabatan.setSelectedItem(safe(tblKaryawan.getValueAt(baris, 5)));
+        cmbDivisi.setSelectedItem(safe(tblKaryawan.getValueAt(baris, 6)));
 
         btnSimpan.setEnabled(false);
         btnUbah.setEnabled(true);
