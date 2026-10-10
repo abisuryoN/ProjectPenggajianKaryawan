@@ -303,40 +303,8 @@ public final class DesignUtil {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setFont(new Font(util.DesignUtil.UI_FONT, Font.PLAIN, 12));
             setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
-            if (isIdColumn(table, column)) {
-                setHorizontalAlignment(SwingConstants.CENTER);
-            } else if (isMoneyColumn(table, column)) {
-                setHorizontalAlignment(SwingConstants.RIGHT);
-            } else {
-                setHorizontalAlignment(SwingConstants.LEFT);
-            }
+            setHorizontalAlignment(SwingConstants.CENTER);
             return this;
-        }
-
-        private boolean isIdColumn(JTable table, int column) {
-            String name = table.getColumnName(column);
-            if (name == null) {
-                return false;
-            }
-            String normalized = name.trim().toLowerCase();
-            return normalized.equals("id")
-                    || normalized.equals("no")
-                    || normalized.equals("no.")
-                    || normalized.startsWith("id ")
-                    || normalized.startsWith("id_");
-        }
-
-        private boolean isMoneyColumn(JTable table, int column) {
-            String name = table.getColumnName(column);
-            if (name == null) {
-                return false;
-            }
-            String normalized = name.trim().toLowerCase();
-            return normalized.contains("gaji")
-                    || normalized.contains("nominal")
-                    || normalized.contains("tunjangan")
-                    || normalized.contains("potongan")
-                    || normalized.contains("total");
         }
     }
 

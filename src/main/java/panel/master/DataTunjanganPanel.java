@@ -13,40 +13,26 @@ import javax.swing.table.DefaultTableModel;
 public class DataTunjanganPanel extends javax.swing.JPanel {
 
     public DataTunjanganPanel() {
-    initComponents();
-    loadJabatan(); 
-    styleButton();
-    tampilData();
-    resetForm();
-    util.DesignUtil.applyPage(this);
+        initComponents();
+        loadJabatan();
+        styleButton();
+        tampilData();
+        resetForm();
+        util.DesignUtil.applyPage(this);
+    }
 
-    tblTunjangan.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            ambilDataDariTabel();
-        }
-    });
-}
+
     
     
     
     private void styleButton() {
-    styleFilledButton(jButton5, new java.awt.Color(20, 184, 166), java.awt.Color.WHITE); // Simpan
-    styleFilledButton(btnUbah, new java.awt.Color(37, 99, 235), java.awt.Color.WHITE);   // Ubah
-    styleFilledButton(btnHapus, new java.awt.Color(239, 68, 68), java.awt.Color.WHITE);  // Hapus
-
-    styleFilledButton(btnReset, new java.awt.Color(243, 244, 246), new java.awt.Color(17, 24, 39));
-    styleFilledButton(btnRefresh1, new java.awt.Color(243, 244, 246), new java.awt.Color(17, 24, 39));
-}
-
-    private void styleFilledButton(javax.swing.JButton button, java.awt.Color bg, java.awt.Color fg) {
-    button.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-    button.setBackground(bg);
-    button.setForeground(fg);
-    button.setOpaque(true);
-    button.setContentAreaFilled(true);
-    button.setBorderPainted(false);
-    button.setFocusPainted(false);
-}
+        util.DesignUtil.styleFilledButton(jButton5, util.DesignUtil.TOMBOL_SEKUNDER, java.awt.Color.WHITE);
+        util.DesignUtil.styleFilledButton(btnUbah, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+        util.DesignUtil.styleFilledButton(btnHapus, util.DesignUtil.TOMBOL_BAHAYA, java.awt.Color.WHITE);
+        util.DesignUtil.styleFilledButton(btnReset, util.DesignUtil.TOMBOL_NETRAL, util.DesignUtil.TEKS_GELAP);
+        util.DesignUtil.styleFilledButton(btnRefresh1, util.DesignUtil.TOMBOL_NETRAL, util.DesignUtil.TEKS_GELAP);
+        util.DesignUtil.styleFilledButton(btnCariTunjangan, util.DesignUtil.TOMBOL_UTAMA, java.awt.Color.WHITE);
+    }
     
     private double ambilNominal() {
     String nominalText = txtNominalTunjangan.getText()
@@ -79,7 +65,9 @@ private int getIdJabatan(String namaJabatan) throws Exception {
 }
 
 private void tampilData() {
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = new DefaultTableModel() {
+        @Override public boolean isCellEditable(int row, int column) { return false; }
+    };
 
     model.addColumn("ID Tunjangan");
     model.addColumn("Nama Tunjangan");
@@ -109,6 +97,7 @@ private void tampilData() {
         }
 
         tblTunjangan.setModel(model);
+        util.DesignUtil.applyTable(tblTunjangan);
 
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal menampilkan data: " + e.getMessage());
@@ -255,7 +244,9 @@ private void hapusData() {
 }
 
 private void cariData() {
-    DefaultTableModel model = new DefaultTableModel();
+    DefaultTableModel model = new DefaultTableModel() {
+        @Override public boolean isCellEditable(int row, int column) { return false; }
+    };
 
     model.addColumn("ID Tunjangan");
     model.addColumn("Nama Tunjangan");
@@ -297,6 +288,7 @@ private void cariData() {
         }
 
         tblTunjangan.setModel(model);
+        util.DesignUtil.applyTable(tblTunjangan);
 
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal mencari data: " + e.getMessage());
@@ -376,41 +368,88 @@ private void loadJabatan() {
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code manually kalau masih mau pakai tab Design NetBeans.
      */
-    @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton5 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        txtidTunjangan = new javax.swing.JTextField();
-        txtNamaTunjangan = new javax.swing.JTextField();
-        txtNominalTunjangan = new javax.swing.JTextField();
-        cmbJabatan = new javax.swing.JComboBox<>();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtKeterangan = new javax.swing.JTextArea();
+        jLabelJudulForm = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        txtidTunjangan = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtNamaTunjangan = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        txtNominalTunjangan = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        cmbJabatan = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtKeterangan = new javax.swing.JTextArea();
+        jButton5 = new javax.swing.JButton();
         btnUbah = new javax.swing.JButton();
         btnHapus = new javax.swing.JButton();
         btnReset = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         scrollTunjangan = new javax.swing.JPanel();
-        btnFirst1 = new javax.swing.JButton();
+        jLabelJudulTabel = new javax.swing.JLabel();
+        txtCariTunjangan = new javax.swing.JTextField();
+        btnCariTunjangan = new javax.swing.JButton();
         btnRefresh1 = new javax.swing.JButton();
-        btnPrev1 = new javax.swing.JButton();
-        btnNext1 = new javax.swing.JButton();
-        btnLast1 = new javax.swing.JButton();
-        lblPage1 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblTunjangan = new javax.swing.JTable();
-        txtCariTunjangan = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        btnCariTunjangan = new javax.swing.JButton();
+
+        setBackground(new java.awt.Color(244, 247, 250));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(22, 48, 92)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("DATA TUNJANGAN");
+
+        jLabel2.setForeground(new java.awt.Color(75, 85, 99));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Kelola Data Tunjangan Karyawan");
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 226, 235)));
+
+        jLabelJudulForm.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabelJudulForm.setForeground(new java.awt.Color(22, 48, 92)); // NOI18N
+        jLabelJudulForm.setText("Form Tunjangan");
+
+        jLabel3.setForeground(new java.awt.Color(75, 85, 99));
+        jLabel3.setText("ID Tunjangan");
+
+        txtidTunjangan.setEditable(false);
+        txtidTunjangan.setBackground(new java.awt.Color(243, 244, 246));
+        txtidTunjangan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtidTunjanganActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setForeground(new java.awt.Color(75, 85, 99));
+        jLabel4.setText("Nama Tunjangan");
+
+        jLabel5.setForeground(new java.awt.Color(75, 85, 99));
+        jLabel5.setText("Nominal");
+
+        txtNominalTunjangan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNominalTunjanganActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setForeground(new java.awt.Color(75, 85, 99));
+        jLabel6.setText("Jabatan");
+
+        jLabel7.setForeground(new java.awt.Color(75, 85, 99));
+        jLabel7.setText("Keterangan");
+
+        txtKeterangan.setColumns(20);
+        txtKeterangan.setRows(3);
+        txtKeterangan.setWrapStyleWord(true);
+        jScrollPane2.setViewportView(txtKeterangan);
 
         jButton5.setBackground(new java.awt.Color(20, 184, 166));
         jButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -421,109 +460,6 @@ private void loadJabatan() {
                 jButton5ActionPerformed(evt);
             }
         });
-
-        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
-
-        jLabel4.setText("ID Tunjangan");
-
-        jLabel5.setText("Nama Tunjangan");
-
-        jLabel6.setText("Nominal");
-
-        jLabel7.setText("Jabatan");
-
-        jLabel8.setText("Keterangan");
-
-        txtidTunjangan.setForeground(new java.awt.Color(204, 204, 204));
-        txtidTunjangan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtidTunjanganActionPerformed(evt);
-            }
-        });
-
-        txtNominalTunjangan.setText("Rp.");
-        txtNominalTunjangan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNominalTunjanganActionPerformed(evt);
-            }
-        });
-
-        cmbJabatan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- Pilih jabatan --", "Manager", "Supervisor", "Staff", "Admin", "HRD", "Keuangan", "IT Support", "Marketing" }));
-
-        txtKeterangan.setColumns(20);
-        txtKeterangan.setRows(5);
-        jScrollPane1.setViewportView(txtKeterangan);
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(15, 118, 110));
-        jLabel3.setText("Form Tunjangan");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel7))
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGap(53, 53, 53)
-                                        .addComponent(cmbJabatan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGap(56, 56, 56)
-                                        .addComponent(txtNominalTunjangan))))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(txtidTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addComponent(txtNamaTunjangan)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(14, 14, 14))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtidTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNamaTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNominalTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(16, 16, 16)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbJabatan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(89, Short.MAX_VALUE))
-        );
 
         btnUbah.setBackground(new java.awt.Color(37, 99, 235));
         btnUbah.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -555,15 +491,91 @@ private void loadJabatan() {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(18, 40, 90)); // NOI18N
-        jLabel1.setText("DATA TUNJANGAN ");
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabelJudulForm)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(12, 12, 12)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtidTunjangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtNominalTunjangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 300, Short.MAX_VALUE))
+                        .addGap(24, 24, 24)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(12, 12, 12)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNamaTunjangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmbJabatan, 0, 200, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jButton5)
+                                .addGap(10, 10, 10)
+                                .addComponent(btnUbah)
+                                .addGap(10, 10, 10)
+                                .addComponent(btnHapus)
+                                .addGap(10, 10, 10)
+                                .addComponent(btnReset))))
+                    .addComponent(jLabelJudulForm))
+                .addGap(16, 16, 16))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jLabelJudulForm)
+                .addGap(12, 12, 12)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtidTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtNamaTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtNominalTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addComponent(cmbJabatan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton5)
+                            .addComponent(btnUbah)
+                            .addComponent(btnHapus)
+                            .addComponent(btnReset))))
+                .addGap(16, 16, 16))
+        );
 
-        jLabel2.setForeground(new java.awt.Color(23, 55, 94));
-        jLabel2.setText("Kelola Data Tunjangan Karyawan");
+        scrollTunjangan.setBackground(new java.awt.Color(255, 255, 255));
+        scrollTunjangan.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(220, 226, 235)));
 
-        btnFirst1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        btnFirst1.setText("<<");
+        jLabelJudulTabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabelJudulTabel.setForeground(new java.awt.Color(22, 48, 92)); // NOI18N
+        jLabelJudulTabel.setText("Daftar Tunjangan");
+
+        btnCariTunjangan.setText("Cari");
+        btnCariTunjangan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCariTunjanganActionPerformed(evt);
+            }
+        });
 
         btnRefresh1.setBackground(new java.awt.Color(243, 244, 246));
         btnRefresh1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -575,35 +587,6 @@ private void loadJabatan() {
             }
         });
 
-        btnPrev1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        btnPrev1.setText("<");
-        btnPrev1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrev1ActionPerformed(evt);
-            }
-        });
-
-        btnNext1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        btnNext1.setText(">");
-        btnNext1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNext1ActionPerformed(evt);
-            }
-        });
-
-        btnLast1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        btnLast1.setText(">>");
-        btnLast1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLast1ActionPerformed(evt);
-            }
-        });
-
-        lblPage1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblPage1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblPage1.setText("1");
-
-        tblTunjangan.setForeground(new java.awt.Color(23, 55, 94));
         tblTunjangan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
@@ -614,68 +597,51 @@ private void loadJabatan() {
             new String [] {
                 "ID Tunjangan", "Nama Tunjangan", "Nominal", "Jabatan", "Keterangan"
             }
-        ));
-        tblTunjangan.setShowHorizontalLines(true);
-        tblTunjangan.setShowVerticalLines(true);
-        jScrollPane3.setViewportView(tblTunjangan);
-
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(15, 118, 110));
-        jLabel10.setText("Daftar Tunjangan");
-
-        btnCariTunjangan.setText("🔍");
-        btnCariTunjangan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCariTunjanganActionPerformed(evt);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
+        tblTunjangan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblTunjanganMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(tblTunjangan);
 
         javax.swing.GroupLayout scrollTunjanganLayout = new javax.swing.GroupLayout(scrollTunjangan);
         scrollTunjangan.setLayout(scrollTunjanganLayout);
         scrollTunjanganLayout.setHorizontalGroup(
             scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                .addGroup(scrollTunjanganLayout.createSequentialGroup()
-                    .addComponent(btnFirst1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnPrev1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(lblPage1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(5, 5, 5)
-                    .addComponent(btnNext1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnLast1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 515, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(scrollTunjanganLayout.createSequentialGroup()
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(txtCariTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCariTunjangan)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnRefresh1)
-                .addGap(9, 9, 9))
+                .addGap(16, 16, 16)
+                .addGroup(scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabelJudulTabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(scrollTunjanganLayout.createSequentialGroup()
+                        .addComponent(txtCariTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)
+                        .addComponent(btnCariTunjangan)
+                        .addGap(8, 8, 8)
+                        .addComponent(btnRefresh1)))
+                .addGap(16, 16, 16))
         );
         scrollTunjanganLayout.setVerticalGroup(
             scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(scrollTunjanganLayout.createSequentialGroup()
-                .addGroup(scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(txtCariTunjangan, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnCariTunjangan)
-                            .addComponent(btnRefresh1)))
-                    .addComponent(jLabel10))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(16, 16, 16)
+                .addComponent(jLabelJudulTabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
                 .addGroup(scrollTunjanganLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnFirst1)
-                    .addComponent(btnPrev1)
-                    .addComponent(btnNext1)
-                    .addComponent(btnLast1)
-                    .addComponent(lblPage1))
-                .addGap(0, 13, Short.MAX_VALUE))
+                    .addComponent(txtCariTunjangan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCariTunjangan)
+                    .addComponent(btnRefresh1))
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 230, Short.MAX_VALUE)
+                .addGap(16, 16, 16))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -683,48 +649,26 @@ private void loadJabatan() {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(27, 27, 27)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(scrollTunjangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(30, 30, 30)
-                                .addComponent(jButton5)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnUbah)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnHapus)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnReset))))
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addContainerGap(29, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrollTunjangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(120, 120, 120)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton5)
-                            .addComponent(btnUbah)
-                            .addComponent(btnHapus)
-                            .addComponent(btnReset))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(scrollTunjangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(16, 16, 16)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(scrollTunjangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(16, 16, 16))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -761,44 +705,35 @@ private void loadJabatan() {
         resetForm();
     }//GEN-LAST:event_btnRefresh1ActionPerformed
 
-    private void btnPrev1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrev1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnPrev1ActionPerformed
 
-    private void btnNext1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNext1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnNext1ActionPerformed
 
-    private void btnLast1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLast1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLast1ActionPerformed
 
+
+
+    private void tblTunjanganMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTunjanganMouseClicked
+        ambilDataDariTabel();
+    }//GEN-LAST:event_tblTunjanganMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCariTunjangan;
-    private javax.swing.JButton btnFirst1;
     private javax.swing.JButton btnHapus;
-    private javax.swing.JButton btnLast1;
-    private javax.swing.JButton btnNext1;
-    private javax.swing.JButton btnPrev1;
     private javax.swing.JButton btnRefresh1;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnUbah;
     private javax.swing.JComboBox<String> cmbJabatan;
     private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabelJudulForm;
+    private javax.swing.JLabel jLabelJudulTabel;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JLabel lblPage1;
     private javax.swing.JPanel scrollTunjangan;
     private javax.swing.JTable tblTunjangan;
     private javax.swing.JTextField txtCariTunjangan;
