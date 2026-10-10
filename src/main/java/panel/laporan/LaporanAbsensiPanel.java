@@ -26,6 +26,17 @@ public class LaporanAbsensiPanel extends javax.swing.JPanel {
                 + bulan[t.getMonthValue()] + " " + t.getYear();
     }
 
+    /** Tanggal lengkap format Indonesia, mis. "Senin, 12 Mei 2026". */
+    private static String tanggalIndonesia(java.util.Date d) {
+        if (d == null) return "";
+        java.time.LocalDate t = new java.sql.Date(d.getTime()).toLocalDate();
+        String[] hari = {"", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"};
+        String[] bulan = {"", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+        return hari[t.getDayOfWeek().getValue()] + ", " + t.getDayOfMonth() + " "
+                + bulan[t.getMonthValue()] + " " + t.getYear();
+    }
+
     public LaporanAbsensiPanel() {
     initComponents();
     rebuildLayout();
@@ -39,8 +50,6 @@ public class LaporanAbsensiPanel extends javax.swing.JPanel {
     cmbKaryawan.setVisible(false);
     jLabel4.setVisible(false); // label "Karyawan"
 
-    btnCari.addActionListener(e -> cariData());
-    btnFilter.addActionListener(e -> filterData());
     btnRefresh.addActionListener(e -> { txtCari.setText(""); filterData(); });
     btnReset.addActionListener(e -> {
         cmbStatus.setSelectedIndex(0);
@@ -49,8 +58,8 @@ public class LaporanAbsensiPanel extends javax.swing.JPanel {
         txtCari.setText("");
         tampilData();
     });
-    btnExportPDF.addActionListener(e -> cetakLaporanJasper());
-    btnCetak.addActionListener(e -> cetakLaporanJasper());
+    // btnCari, btnFilter, btnExportPDF, btnCetak sudah punya handler dari
+    // GUI Builder (.form); tidak dipasang lagi di sini supaya tidak jalan 2x.
     cmbStatus.addActionListener(e -> filterData());
     tblLaporanAbsensi.setDefaultEditor(Object.class, null);
     tblLaporanAbsensi.getTableHeader().setReorderingAllowed(false);
@@ -82,6 +91,15 @@ private void rebuildLayout() {
     filter.add(jLabel3); filter.add(jDateChooser2);
     filter.add(jLabel6); filter.add(cmbStatus);
     filter.add(jLabel7); filter.add(txtCari);
+
+    // Label ringkasan tanggal terpilih: "Senin, 12 Mei 2026".
+    // JDateChooser hanya menampilkan teks di dalam kotaknya, jadi ringkasan
+    // hari/tanggal/bulan yang dipilih ditampilkan di sini.
+    lblTanggalTerpilih = new javax.swing.JLabel();
+    lblTanggalTerpilih.setFont(new java.awt.Font(util.DesignUtil.UI_FONT, java.awt.Font.BOLD, 12));
+    lblTanggalTerpilih.setForeground(new java.awt.Color(22, 48, 92));
+    filter.add(lblTanggalTerpilih);
+    updateLabelTanggal();
 
     javax.swing.JPanel btnPanel = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 0));
     btnPanel.setOpaque(false);
@@ -175,8 +193,23 @@ private void setupDateChooser() {
     jDateChooser2.setDateFormatString("dd MMM yyyy");
     jDateChooser1.setDate(null);
     jDateChooser2.setDate(null);
-    jDateChooser1.addPropertyChangeListener("date", e -> filterData());
-    jDateChooser2.addPropertyChangeListener("date", e -> filterData());
+    jDateChooser1.addPropertyChangeListener("date", e -> { updateLabelTanggal(); filterData(); });
+    jDateChooser2.addPropertyChangeListener("date", e -> { updateLabelTanggal(); filterData(); });
+}
+
+/** Perbarui label ringkasan tanggal terpilih (hari + tanggal + bulan Indonesia). */
+private void updateLabelTanggal() {
+    java.util.Date awal = jDateChooser1.getDate();
+    java.util.Date akhir = jDateChooser2.getDate();
+    if (awal == null && akhir == null) {
+        lblTanggalTerpilih.setText("");
+    } else if (akhir == null) {
+        lblTanggalTerpilih.setText("Dipilih: " + tanggalIndonesia(awal));
+    } else if (awal == null) {
+        lblTanggalTerpilih.setText("s.d. " + tanggalIndonesia(akhir));
+    } else {
+        lblTanggalTerpilih.setText(tanggalIndonesia(awal) + "  s.d.  " + tanggalIndonesia(akhir));
+    }
 }
 
 private DefaultTableModel createTableModel() {
@@ -248,9 +281,9 @@ private void loadAbsensiData(boolean useFilter) {
             if (tanggalAkhir != null) { sql.append("AND a.tanggal <= ? "); params.add(tanggalAkhir); }
             if (status != null) { sql.append("AND a.status = ? "); params.add(status); }
             if (!keyword.isEmpty()) {
-                sql.append("AND (a.tanggal LIKE ? OR a.status LIKE ? OR COALESCE(a.keterangan,'') LIKE ?) ");
+                sql.append("AND (k.nama_karyawan LIKE ? OR a.tanggal LIKE ? OR a.status LIKE ? OR COALESCE(a.keterangan,'') LIKE ?) ");
                 String like = "%" + keyword + "%";
-                params.add(like); params.add(like); params.add(like);
+                params.add(like); params.add(like); params.add(like); params.add(like);
             }
         }
 
@@ -722,6 +755,7 @@ private void cetakLaporanJasper() {
     private com.toedter.calendar.JCalendar jCalendar1;
     private com.toedter.calendar.JDateChooser jDateChooser1;
     private com.toedter.calendar.JDateChooser jDateChooser2;
+    private javax.swing.JLabel lblTanggalTerpilih;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

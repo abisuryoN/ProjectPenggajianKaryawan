@@ -3,7 +3,9 @@ import config.Koneksi;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -46,9 +48,10 @@ public class LaporanGajiPanel extends javax.swing.JPanel {
         txtTahun.setText(String.valueOf(java.time.LocalDate.now().getYear()));
         tampilData();
     });
-    btnCetak.addActionListener(e -> cetakLaporanJasper());
-    btnExportPDF.addActionListener(e -> cetakLaporanJasper());
+    // btnCetak & btnExportPDF sudah punya handler dari GUI Builder (.form).
     cmbBulan.addActionListener(e -> filterData());
+    txtCari.addActionListener(e -> filterData());
+    txtTahun.addActionListener(e -> filterData());
     tblLaporanGaji.setDefaultEditor(Object.class, null);
     tblLaporanGaji.getTableHeader().setReorderingAllowed(false);
 }
@@ -156,7 +159,9 @@ private void loadBulan() {
     String[] bulan = {"Januari", "Februari", "Maret", "April", "Mei", "Juni",
                       "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
     for (String b : bulan) cmbBulan.addItem(b);
-    cmbBulan.setSelectedIndex(java.time.LocalDate.now().getMonthValue());
+    // Default "Semua Bulan" supaya filter nama/tahun tidak diam-diam
+    // tersaring bulan berjalan (data lama jadi tidak ketemu).
+    cmbBulan.setSelectedIndex(0);
 }
 
 private String formatRupiah(String angka) {
@@ -245,35 +250,44 @@ private void filterData() {
             "SELECT p.*, k.nama_karyawan FROM penggajian p "
             + "JOIN karyawan k ON p.id_karyawan = k.id_karyawan WHERE 1=1 "
         );
-        
-        int idLogin = util.Session.getIdKaryawan(); // ✅
-        sql.append("AND p.id_karyawan = ").append(idLogin).append(" ");
-        
+        List<Object> params = new ArrayList<>();
+
+        // batasi ke karyawan yang login HANYA kalau bukan HRD
+        if (!util.Session.isHRD()) {
+            sql.append("AND p.id_karyawan = ? ");
+            params.add(util.Session.getIdKaryawan());
+        }
+
         if (cmbKaryawan.getSelectedIndex() > 0) {
             String selected = cmbKaryawan.getSelectedItem().toString();
             int idKaryawan = Integer.parseInt(selected.split(" - ")[0]);
-            sql.append("AND p.id_karyawan = ").append(idKaryawan).append(" ");
+            sql.append("AND p.id_karyawan = ? ");
+            params.add(idKaryawan);
         }
 
         String tahun = txtTahun.getText().trim();
         if (!tahun.isEmpty()) {
-            sql.append("AND p.periode LIKE '").append(tahun).append("%' ");
+            sql.append("AND p.periode LIKE ? ");
+            params.add(tahun + "%");
         }
 
         if (cmbBulan.getSelectedIndex() > 0) {
             String bulanIdx = String.format("%02d", cmbBulan.getSelectedIndex());
-            sql.append("AND p.periode LIKE '%-").append(bulanIdx).append("' ");
+            sql.append("AND p.periode LIKE ? ");
+            params.add("%-" + bulanIdx);
         }
 
         String keyword = txtCari.getText().trim();
         if (!keyword.isEmpty()) {
-            sql.append("AND k.nama_karyawan LIKE '%").append(keyword).append("%' ");
+            sql.append("AND k.nama_karyawan LIKE ? ");
+            params.add("%" + keyword + "%");
         }
 
         sql.append("ORDER BY p.id_penggajian DESC");
 
         Connection conn = Koneksi.getConnection();
         PreparedStatement pst = conn.prepareStatement(sql.toString());
+        for (int i = 0; i < params.size(); i++) pst.setObject(i + 1, params.get(i));
         ResultSet rs = pst.executeQuery();
         int no = 1;
         while (rs.next()) {
