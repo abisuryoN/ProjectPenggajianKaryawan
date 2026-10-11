@@ -19,7 +19,8 @@ import panel.master.DataDivisiPanel;
 import panel.master.DataJabatanPanel;
 import panel.master.DataKaryawanPanel;
 import panel.master.DataTunjanganPanel;
-import panel.transaksi.AbsensiPanel;
+import panel.transaksi.AbsensiHRDPanel;
+import panel.transaksi.AbsensiKaryawanPanel;
 import panel.transaksi.PenggajianPanel;
 
 public class SidebarPanel extends JPanel {
@@ -71,7 +72,7 @@ public class SidebarPanel extends JPanel {
             addMenuButton("Data Divisi", () -> dashboard.tampilPanel(new DataDivisiPanel()));
 
             addSection("TRANSAKSI");
-            addMenuButton("Absensi", () -> dashboard.tampilPanel(new AbsensiPanel()));
+            addMenuButton("Absensi Karyawan (HRD)", () -> dashboard.tampilPanel(new AbsensiHRDPanel()));
             addMenuButton("Penggajian", () -> dashboard.tampilPanel(new PenggajianPanel()));
 
             addSection("LAPORAN");
@@ -81,7 +82,7 @@ public class SidebarPanel extends JPanel {
             addMenuButton("Laporan Divisi", () -> dashboard.tampilPanel(new LaporanDivisiPanel()));
         } else {
             addSection("MENU KARYAWAN");
-            addMenuButton("Absensi", () -> dashboard.tampilPanel(new AbsensiPanel()));
+            addMenuButton("Absensi", () -> dashboard.tampilPanel(new AbsensiKaryawanPanel()));
             addMenuButton("Riwayat Absensi", () -> dashboard.tampilPanel(new LaporanAbsensiPanel()));
             addMenuButton("Slip Gaji", () -> dashboard.tampilPanel(new LaporanGajiPanel()));
         }

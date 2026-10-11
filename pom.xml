@@ -42,6 +42,21 @@
         <version>1.4</version>
     </dependency>
 
+    <!-- OpenCV bundel native Linux x86_64 + Windows: kamera + deteksi/verifikasi wajah -->
+    <dependency>
+        <groupId>org.openpnp</groupId>
+        <artifactId>opencv</artifactId>
+        <version>4.9.0-0</version>
+    </dependency>
+
+    <!-- JUnit 5 untuk unit test aturan bisnis (radius, penggajian) -->
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.10.2</version>
+        <scope>test</scope>
+    </dependency>
+
 </dependencies>
 
     <build>

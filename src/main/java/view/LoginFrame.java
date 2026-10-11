@@ -262,7 +262,7 @@ private void prosesLogin() {
                 namaKaryawan = "HRD Utama";
             }
 
-            util.Session.login(idKaryawan, namaKaryawan, role);
+            util.Session.login(rs.getInt("id_user"), idKaryawan, namaKaryawan, username, role);
 
             dispose();
             new DashboardFrame().setVisible(true);
