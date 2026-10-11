@@ -19,8 +19,8 @@ import panel.master.DataDivisiPanel;
 import panel.master.DataJabatanPanel;
 import panel.master.DataKaryawanPanel;
 import panel.master.DataTunjanganPanel;
-import panel.transaksi.AbsensiHRDPanel;
-import panel.transaksi.AbsensiKaryawanPanel;
+import panel.absensi.AbsensiHRDPanel;
+import panel.absensi.AbsensiKaryawanPanel;
 import panel.transaksi.PenggajianPanel;
 
 public class SidebarPanel extends JPanel {
@@ -73,6 +73,7 @@ public class SidebarPanel extends JPanel {
 
             addSection("TRANSAKSI");
             addMenuButton("Absensi Karyawan (HRD)", () -> dashboard.tampilPanel(new AbsensiHRDPanel()));
+            addMenuButton("Absensi Saya (HRD)", () -> dashboard.tampilPanel(new AbsensiKaryawanPanel()));
             addMenuButton("Penggajian", () -> dashboard.tampilPanel(new PenggajianPanel()));
 
             addSection("LAPORAN");

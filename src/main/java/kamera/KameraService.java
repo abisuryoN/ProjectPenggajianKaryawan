@@ -12,11 +12,42 @@ import org.opencv.videoio.Videoio;
 /**
  * Pembungkus kamera V4L2 (Linux) di background thread (Bagian C §8).
  *
- * <p>Kontrak orientasi (§9): frame diteruskan APA ADANYA dari driver ke UI —
- * tidak ada {@code Core.flip(...,1)}, tidak ada operasi mirror, baik di
- * preview maupun saat foto disimpan. Preview dan bukti SELALU konsisten.
+ * <p>Kontrak orientasi: frame mentah dari driver TIDAK pernah diubah —
+ * {@code frameTerakhir()} dan semua pendengar menerima citra orientasi asli,
+ * dipakai untuk analisis wajah, liveness, dan foto bukti. Untuk TAMPILAN
+ * preview, panel memanggil {@link #cermin} (flip horizontal) sesuai
+ * {@link #mirrorPreview}; frame analisis/disimpan tidak pernah di-flip.
  */
 public class KameraService {
+
+    /**
+     * Preview tampil seperti cermin (selfie view). Dengan mirror, gerakan
+     * Anda terasa "searah": angkat tangan kanan, di layar tangan itu tampil di
+     * sisi KANAN — sama seperti bercermin.
+     *
+     * <p>PENTING: ini HANYA untuk tampilan. Frame yang dipakai verifikasi
+     * wajah dan disimpan sebagai bukti TIDAK di-flip; lihat {@link #cermin}.
+     */
+    public static final boolean mirrorPreview = true;
+
+    /**
+     * Siapkan gambar untuk DITAMPILKAN sesuai {@link #mirrorPreview}.
+     *
+     * <p>Jangan pakai method ini untuk frame yang dianalisis/disimpan — frame
+     * itu harus tetap orientasi asli agar hasil verifikasi konsisten dengan
+     * data yang tersimpan.
+     */
+    public static BufferedImage cermin(BufferedImage gambar) {
+        if (!mirrorPreview || gambar == null) return gambar;
+        int w = gambar.getWidth(), h = gambar.getHeight();
+        BufferedImage hasil = new BufferedImage(w, h, gambar.getType() == 0
+                ? BufferedImage.TYPE_INT_RGB : gambar.getType());
+        java.awt.Graphics2D g = hasil.createGraphics();
+        // flip horizontal: gambar sumber digambar terbalik kiri-kanan
+        g.drawImage(gambar, w, 0, -w, h, null);
+        g.dispose();
+        return hasil;
+    }
 
     /** Pendengar frame baru (dipanggil dari thread kamera — jangan blokir). */
     public interface PendengarFrame {
@@ -66,9 +97,43 @@ public class KameraService {
                     // resolusi wajar, biarkan driver menyesuaikan bila ditolak
                     vc.set(Videoio.CAP_PROP_FRAME_WIDTH, 640);
                     vc.set(Videoio.CAP_PROP_FRAME_HEIGHT, 480);
+                    // Minta format BERWARNA: YUYV dulu, MJPG cadangan. Tanpa
+                    // ini OpenCV bisa menerima format apapun yang ditawarkan
+                    // driver — termasuk node monokrom (IR) — sehingga preview
+                    // tampil abu-abu.
+                    boolean formatWarna = vc.set(Videoio.CAP_PROP_FOURCC,
+                            org.opencv.videoio.VideoWriter.fourcc('Y', 'U', 'Y', 'V'));
+                    if (!formatWarna) {
+                        vc.set(Videoio.CAP_PROP_FOURCC,
+                                org.opencv.videoio.VideoWriter.fourcc('M', 'J', 'P', 'G'));
+                    }
+                    Mat uji = new Mat();
+                    // Kamera lambat start: beri beberapa kesempatan membaca
+                    // frame pertama sebelum menyimpulkan node ini kosong.
+                    boolean adaFrame = false;
+                    for (int coba = 0; coba < 10 && !adaFrame; coba++) {
+                        adaFrame = vc.read(uji);
+                        if (!adaFrame) {
+                            try { Thread.sleep(150); } catch (InterruptedException ie) {
+                                Thread.currentThread().interrupt();
+                                break;
+                            }
+                        }
+                    }
+                    int kanal = adaFrame ? uji.channels() : 0;
+                    uji.release();
+                    if (!adaFrame || kanal < 3) {
+                        // Node IR/metadata: frame abu-abu atau kosong -> jangan dipakai.
+                        vc.release();
+                        statusTerakhir = "/dev/video" + index
+                                + " bukan kamera berwarna (kanal=" + kanal
+                                + "); mencoba node lain...";
+                        continue;
+                    }
                     tangkapan = vc;
                     jalan.set(true);
-                    statusTerakhir = "Kamera aktif (/dev/video" + index + ").";
+                    statusTerakhir = "Kamera aktif (/dev/video" + index
+                            + ", " + (formatWarna ? "YUYV" : "MJPG") + ").";
                     utas = new Thread(this::lingkaranBaca, "kamera-reader");
                     utas.setDaemon(true);
                     utas.start();
@@ -154,7 +219,7 @@ public class KameraService {
         return (m == null || m.isEmpty()) ? t.getClass().getSimpleName() : m;
     }
 
-    /** Mat BGR -> BufferedImage RGB (tanpa flip). */
+    /** Mat BGR (OpenCV) -> BufferedImage BGR untuk ditampilkan (tanpa flip). */
     public static BufferedImage matKeGambar(Mat mat) {
         int lebar = mat.cols(), tinggi = mat.rows();
         int kanal = mat.channels();
@@ -163,7 +228,13 @@ public class KameraService {
         BufferedImage img;
         if (kanal == 3) {
             img = new BufferedImage(lebar, tinggi, BufferedImage.TYPE_3BYTE_BGR);
-            img.getRaster().setDataElements(0, 0, lebar, tinggi, data);
+            // Salin byte BGR LANGSUNG ke buffer citra (urutan memori sama:
+            // kanal 0 = Blue). Jangan pakai setDataElements(byte[]): pada JDK
+            // ini method itu menafsirkan array sebagai R,G,B sehingga kanal
+            // merah/biru tertukar dan warna tampil pucat/salah.
+            byte[] tujuan = ((java.awt.image.DataBufferByte)
+                    img.getRaster().getDataBuffer()).getData();
+            System.arraycopy(data, 0, tujuan, 0, data.length);
         } else if (kanal == 1) {
             img = new BufferedImage(lebar, tinggi, BufferedImage.TYPE_BYTE_GRAY);
             img.getRaster().setDataElements(0, 0, lebar, tinggi, data);

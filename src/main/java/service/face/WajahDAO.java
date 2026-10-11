@@ -181,4 +181,30 @@ public class WajahDAO {
         }
         return hasil;
     }
+
+    /**
+     * Hapus template wajah seorang karyawan (HRD). Setelah ini karyawan
+     * tersebut WAJIB registrasi ulang sebelum bisa absen — konsisten dengan
+     * pintu gerbang registrasi di halaman absensi karyawan.
+     *
+     * @param idUserHRD id users HRD pemanggil (audit/log).
+     */
+    public void hapusTemplate(int idUserHRD, int idKaryawan) throws Exception {
+        if (idKaryawan <= 0) {
+            throw new IllegalArgumentException("ID karyawan tidak valid.");
+        }
+        try (Connection c = Koneksi.getConnection();
+             PreparedStatement ps = c.prepareStatement(
+                     "DELETE FROM wajah_karyawan WHERE id_karyawan = ?")) {
+            ps.setInt(1, idKaryawan);
+            ps.executeUpdate();
+        }
+        // Audit ke log verifikasi agar jejak penghapusan tetap ada.
+        try {
+            service.AbsensiService.catatLog(idKaryawan, java.time.LocalDate.now(),
+                    "TEMPLATE_DIHAPUS",
+                    "Template wajah dihapus oleh user id " + idUserHRD
+                            + "; karyawan wajib registrasi ulang");
+        } catch (Exception ignored) { }
+    }
 }

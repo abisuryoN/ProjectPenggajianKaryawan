@@ -172,12 +172,8 @@ private void simpanData() {
             ResultSet generatedKeys = pst.getGeneratedKeys();
             if (generatedKeys.next()) {
                 int idKaryawan = generatedKeys.getInt(1);
-                String sqlUser = "INSERT INTO users (id_karyawan, username, password, role) VALUES (?, ?, ?, 'KARYAWAN')";
-                PreparedStatement pstUser = conn.prepareStatement(sqlUser);
-                pstUser.setInt(1, idKaryawan);
-                pstUser.setString(2, username);
-                pstUser.setString(3, password);
-                pstUser.executeUpdate();
+                // Pakai aturan yang sama dengan ubahData (cek duplikat dsb).
+                simpanAkunLogin(conn, idKaryawan, username, password);
             }
         }       
 
@@ -197,6 +193,8 @@ private void ubahData() {
     String noHp = txtNoHp.getText().trim();
     String jabatan = cmbJabatan.getSelectedItem().toString();
     String divisi = cmbDivisi.getSelectedItem().toString();
+    String username = txtUsername.getText().trim();
+    String password = txtPassword.getText().trim();
 
     if (idKaryawan.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Pilih data dari tabel dulu.");
@@ -219,11 +217,112 @@ private void ubahData() {
         pst.setString(7, idKaryawan);
         pst.executeUpdate();
 
+        // Akun login disimpan di tabel users, BUKAN di tabel karyawan. Tanpa
+        // langkah ini, username/password yang diubah di form tidak tersimpan
+        // sehingga karyawan tidak bisa login dengan akun baru.
+        simpanAkunLogin(conn, Integer.parseInt(idKaryawan), username, password);
+
         JOptionPane.showMessageDialog(this, "Data karyawan berhasil diubah.");
         tampilData();
         resetForm();
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal mengubah: " + e.getMessage());
+    }
+}
+
+/**
+ * Terapkan perubahan username/password ke tabel users.
+ *
+ * <p>Aturan:
+ * <ul>
+ *   <li>Username tidak berubah DAN password kosong -> akun tidak diubah.</li>
+ *   <li>Username berubah -> password wajib diisi.</li>
+ *   <li>Password diisi -> password diperbarui (username ikut diperbarui bila diubah).</li>
+ *   <li>Username yang dipakai akun lain -> ditolak dengan pesan jelas.</li>
+ *   <li>Belum punya akun dan kedua kolom kosong -> tidak dibuatkan akun.</li>
+ * </ul>
+ */
+private void simpanAkunLogin(Connection conn, int idKaryawan, String usernameBaru, String passwordBaru)
+        throws Exception {
+    String usernameLama = "";
+    try (PreparedStatement cek = conn.prepareStatement(
+            "SELECT username FROM users WHERE id_karyawan = ?")) {
+        cek.setInt(1, idKaryawan);
+        try (ResultSet rs = cek.executeQuery()) {
+            if (rs.next()) usernameLama = rs.getString("username");
+        }
+    }
+    if (usernameLama == null) usernameLama = "";
+    boolean punyaAkun = !usernameLama.isEmpty();
+
+    if (usernameBaru.isEmpty()) {
+        if (passwordBaru.isEmpty()) {
+            return; // tidak ada perubahan akun
+        }
+        if (!punyaAkun) {
+            throw new IllegalArgumentException(
+                "Isi username dulu sebelum menentukan password.");
+        }
+        usernameBaru = usernameLama; // ganti password saja
+    }
+    boolean usernameBerubah = !usernameBaru.equals(usernameLama);
+    if (!punyaAkun && passwordBaru.isEmpty()) {
+        throw new IllegalArgumentException(
+            "Isi password untuk akun baru \"" + usernameBaru + "\".");
+    }
+    if (punyaAkun && usernameBerubah && passwordBaru.isEmpty()) {
+        throw new IllegalArgumentException(
+            "Isi password baru karena username diubah menjadi \"" + usernameBaru + "\".");
+    }
+    if (!punyaAkun && !passwordBaru.isEmpty()) {
+        // akun baru: pakai passwordBaru apa adanya
+    }
+    if (punyaAkun && passwordBaru.isEmpty() && !usernameBerubah) {
+        return; // tidak ada yang berubah
+    }
+
+    // Username tidak boleh dipakai akun lain (termasuk akun HRD).
+    try (PreparedStatement cek = conn.prepareStatement(
+            "SELECT id_karyawan FROM users WHERE username = ?")) {
+        cek.setString(1, usernameBaru);
+        try (ResultSet rs = cek.executeQuery()) {
+            if (rs.next()) {
+                int pemilik = rs.getInt("id_karyawan");
+                boolean milikSendiri = punyaAkun && !rs.wasNull() && pemilik == idKaryawan;
+                if (!milikSendiri) {
+                    throw new IllegalArgumentException(
+                        "Username \"" + usernameBaru + "\" sudah dipakai akun lain.");
+                }
+            }
+        }
+    }
+
+    if (punyaAkun) {
+        if (passwordBaru.isEmpty()) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE users SET username = ? WHERE id_karyawan = ?")) {
+                ps.setString(1, usernameBaru);
+                ps.setInt(2, idKaryawan);
+                ps.executeUpdate();
+            }
+        } else {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE users SET username = ?, password = ? WHERE id_karyawan = ?")) {
+                ps.setString(1, usernameBaru);
+                ps.setString(2, passwordBaru);
+                ps.setInt(3, idKaryawan);
+                ps.executeUpdate();
+            }
+        }
+    } else {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO users (id_karyawan, username, password, role) "
+                + "VALUES (?, ?, ?, 'KARYAWAN')")) {
+            ps.setInt(1, idKaryawan);
+            ps.setString(2, usernameBaru);
+            ps.setString(3, passwordBaru);
+            ps.executeUpdate();
+        }
     }
 }
 
@@ -379,9 +478,34 @@ private void ambilDataDariTabel() {
         cmbJabatan.setSelectedItem(safe(tblKaryawan.getValueAt(baris, 5)));
         cmbDivisi.setSelectedItem(safe(tblKaryawan.getValueAt(baris, 6)));
 
+        // Tampilkan username yang SUDAH tertaut agar HRD tidak menimpa akun
+        // yang salah. Password sengaja dikosongkan (tidak boleh tampil di
+        // layar); kolom kosong berarti password TIDAK diubah.
+        txtUsername.setText("");
+        txtPassword.setText("");
+        muatUsernameTertaut();
+
         btnSimpan.setEnabled(false);
         btnUbah.setEnabled(true);
         btnHapus.setEnabled(true);
+    }
+}
+
+/** Isi field username dengan akun yang sudah tertaut (kosong bila belum ada). */
+private void muatUsernameTertaut() {
+    String idKaryawan = txtIdKaryawan.getText().trim();
+    if (idKaryawan.isEmpty()) return;
+    try (Connection conn = Koneksi.getConnection();
+         PreparedStatement ps = conn.prepareStatement(
+                 "SELECT username FROM users WHERE id_karyawan = ?")) {
+        ps.setInt(1, Integer.parseInt(idKaryawan));
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                txtUsername.setText(rs.getString("username"));
+            }
+        }
+    } catch (Exception e) {
+        // cukup biarkan kosong; perubahan akun tetap bisa dilakukan manual
     }
 }
 

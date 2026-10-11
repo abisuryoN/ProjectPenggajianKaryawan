@@ -131,8 +131,20 @@ public final class OpenCvBridge {
         /** Skor keyakinan deteksi 0..1. */
         public final float skor;
 
+        /**
+         * Landmark YuNet 5 titik (x,y berpasangan) dalam koordinat citra asli:
+         * [0,1]=mata A, [2,3]=mata B, [4,5]=hidung, [6,7..9]=sudut mulut.
+         * Tanpa transformasi apa pun. Null bila tidak tersedia.
+         */
+        public final double[] landmark;
+
         WajahTerdeteksi(int x, int y, int w, int h, float skor) {
-            this.x = x; this.y = y; this.lebar = w; this.tinggi = h; this.skor = skor;
+            this(x, y, w, h, skor, null);
+        }
+
+        WajahTerdeteksi(int x, int y, int w, int h, float skor, double[] landmark) {
+            this.x = x; this.y = y; this.lebar = w; this.tinggi = h;
+            this.skor = skor; this.landmark = landmark;
         }
     }
 
@@ -150,11 +162,27 @@ public final class OpenCvBridge {
             detektor.detect(salinan, hasil);
             List<WajahTerdeteksi> daftar = new ArrayList<>();
             if (!hasil.empty() && hasil.rows() > 0) {
+                // Keluaran YuNet: Mat CV_32F (N x 15) berisi
+                // [x, y, w, h, 10 nilai landmark, skor].
+                //
+                // PENTING: pada Mat CV_32F ini:
+                //   - get(i, 0)             mengembalikan double[1] (1 elemen!)
+                //   - get(i, 0, double[])   TIDAK didukung (UnsupportedOperationException)
+                //   - get(i, 0, float[])    BENAR — satu baris penuh terisi
+                // Karena itu arraycopy dari get(i,0) melempar
+                // "last source index 14 out of bounds for double[1]".
+                int kolom = hasil.cols();
+                float[] b = new float[kolom];
                 for (int i = 0; i < hasil.rows(); i++) {
-                    double[] b = hasil.get(i, 0);
-                    // kolom: x y w h landmark(5x2) skor
+                    hasil.get(i, 0, b);
+                    double[] lm = null;
+                    if (kolom >= 15) {
+                        lm = new double[10];
+                        for (int j = 0; j < 10; j++) lm[j] = b[4 + j];
+                    }
                     daftar.add(new WajahTerdeteksi(
-                            (int) b[0], (int) b[1], (int) b[2], (int) b[3], (float) b[14]));
+                            (int) b[0], (int) b[1], (int) b[2], (int) b[3],
+                            kolom > 14 ? b[14] : 0f, lm));
                 }
             }
             hasil.release();
