@@ -119,6 +119,34 @@ public class WajahDAO {
     }
 
     /**
+     * Muat SEMUA template wajah milik akun LAIN (untuk cek wajah kembar
+     * lintas akun saat registrasi). Satu wajah hanya boleh terdaftar di
+     * satu akun — wajah yang sudah milik orang lain harus ditolak sejak
+     * foto pertama.
+     */
+    public List<TemplateWajah> muatSemuaTemplateKecuali(int idKaryawan) throws Exception {
+        String sql = "SELECT w.id_karyawan, k.nama_karyawan, w.template "
+                + "FROM wajah_karyawan w "
+                + "JOIN karyawan k ON k.id_karyawan = w.id_karyawan "
+                + "WHERE w.id_karyawan <> ?";
+        List<TemplateWajah> hasil = new ArrayList<>();
+        try (Connection c = Koneksi.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, idKaryawan);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    float[] emb = bytesKeEmbedding(rs.getBytes("template"));
+                    if (emb != null) {
+                        hasil.add(new TemplateWajah(rs.getInt("id_karyawan"),
+                                rs.getString("nama_karyawan"), emb));
+                    }
+                }
+            }
+        }
+        return hasil;
+    }
+
+    /**
      * Daftarkan/ganti template wajah karyawan.
      *
      * @param olehHRD wajib true — pendaftaran hanya oleh HRD (cek di service).

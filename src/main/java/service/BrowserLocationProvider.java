@@ -35,8 +35,11 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class BrowserLocationProvider implements LocationProvider {
 
-    /** Batas waktu menunggu pengguna menyetujui & browser mengirim posisi. */
-    private static final long TIMEOUT_MS = 90_000;
+    /**
+     * Batas waktu menunggu pengguna menyetujui & browser mengirim posisi.
+     * Longgar karena pengguna harus menjawab dialog izin lokasi browser.
+     */
+    private static final long TIMEOUT_MS = 180_000;
 
     /** Host loopback saja — jangan pernah buka ke jaringan. */
     private static final String HOST = "127.0.0.1";
@@ -50,7 +53,10 @@ public class BrowserLocationProvider implements LocationProvider {
     public HasilLokasiPengguna ambilLokasi() {
         ServerSocket server = null;
         try {
-            server = new ServerSocket(0, 1, java.net.InetAddress.getByName(HOST));
+            // Backlog longgar: browser sering membuka beberapa koneksi hampir
+            // bersamaan (preconnect); backlog terlalu kecil membuat koneksi
+            // berikutnya ditolak (ERR_CONNECTION_REFUSED).
+            server = new ServerSocket(0, 64, java.net.InetAddress.getByName(HOST));
             int port = server.getLocalPort();
             server.setSoTimeout((int) TIMEOUT_MS);
 
@@ -63,6 +69,11 @@ public class BrowserLocationProvider implements LocationProvider {
             AtomicReference<String> hasil = new AtomicReference<>(null);
             long tenggat = System.currentTimeMillis() + TIMEOUT_MS;
             while (System.currentTimeMillis() < tenggat && hasil.get() == null) {
+                // Satu koneksi yang gagal TIDAK boleh menghentikan penantian:
+                // browser sering membuka soket spekulatif/preconnect lalu
+                // menutupnya tanpa mengirim apa pun, meminta /favicon.ico, atau
+                // memutus sambungan saat halaman di-reload. Semua itu normal —
+                // tangani per koneksi dan lanjut menunggu sampai tenggat.
                 try (Socket klien = server.accept()) {
                     klien.setSoTimeout(5_000);
                     String barisPertama = bacaPermintaan(klien, hasil);
@@ -70,6 +81,8 @@ public class BrowserLocationProvider implements LocationProvider {
                     kirimHalaman(klien, barisPertama);
                 } catch (java.net.SocketTimeoutException ulang) {
                     // tidak ada sambungan baru; terus tunggu sampai tenggat
+                } catch (Exception koneksiGagal) {
+                    // koneksi ini bermasalah (reset/putus) — abaikan, tetap tunggu
                 }
             }
 
@@ -114,6 +127,16 @@ public class BrowserLocationProvider implements LocationProvider {
     }
 
     private void kirimHalaman(Socket klien, String barisPertama) throws Exception {
+        // Permintaan yang tidak kita pedulikan (favicon, dsb) dijawab cepat
+        // supaya browser tidak menahan sambungan sambil menunggu.
+        if (barisPertama.contains("/favicon")) {
+            String h204 = "HTTP/1.1 204 No Content\r\n"
+                    + "Content-Length: 0\r\n"
+                    + "Connection: close\r\n\r\n";
+            klien.getOutputStream().write(h204.getBytes(StandardCharsets.UTF_8));
+            klien.getOutputStream().flush();
+            return;
+        }
         boolean permintaanHasil = barisPertama.contains("/hasil");
         String halaman = permintaanHasil ? halamanSelesai() : halamanUtama();
         byte[] isi = halaman.getBytes(StandardCharsets.UTF_8);
@@ -145,12 +168,18 @@ public class BrowserLocationProvider implements LocationProvider {
              + "<button id=\"b\">Izinkan &amp; Kirim Lokasi</button>"
              + "<div class=\"s\" id=\"s\"></div></div><script>"
              + "var s=document.getElementById('s');"
-             + "function kirim(p){s.textContent='Mengirim lokasi...';"
+             + "function kirim(p){"
              + "var q='?lat='+encodeURIComponent(p.coords.latitude)"
              + "+'&lon='+encodeURIComponent(p.coords.longitude)"
              + "+'&acc='+encodeURIComponent(p.coords.accuracy||-1);"
-             + "fetch('/hasil'+q).then(function(){s.textContent='Lokasi terkirim. "
-             + "Kembali ke aplikasi absensi.';}).catch(function(e){s.textContent='Gagal mengirim: '+e;});}"
+             + "var n=0;"
+             + "function coba(){n++;s.textContent='Mengirim lokasi... (percobaan '+n+')';"
+             + "fetch('/hasil'+q).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);"
+             + "s.textContent='Lokasi terkirim. Kembali ke aplikasi absensi.';})"
+             + ".catch(function(e){if(n<3){setTimeout(coba,1200);return;}"
+             + "s.textContent='Gagal mengirim ('+e+'). Kembali ke aplikasi absensi, "
+             + "lalu tekan Perbarui Lokasi sekali lagi.';});}"
+             + "coba();}"
              + "function ambil(){s.textContent='Meminta izin lokasi...';"
              + "if(!navigator.geolocation){s.textContent='Browser ini tidak mendukung geolokasi.';return;}"
              + "navigator.geolocation.getCurrentPosition(kirim,"

@@ -364,7 +364,7 @@ public class RegistrasiWajahPanel extends JPanel {
         btnAmbil.setText("Memproses...");
         new SwingWorker<RegistrasiWajahService.HasilAmbil, Void>() {
             @Override protected RegistrasiWajahService.HasilAmbil doInBackground() {
-                return registrasi.ambilDariFrame(frame);
+                return registrasi.ambilDariFrame(frame, idKaryawanSesi);
             }
             @Override protected void done() {
                 btnAmbil.setText("Ambil Foto");

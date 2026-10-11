@@ -38,6 +38,14 @@ public class RegistrasiWajahService {
     /** Jumlah sampel wajib satu sesi registrasi. */
     public static final int JUMLAH_SAMPEL = 3;
 
+    /**
+     * Ambang cosine similarity untuk menyatakan wajah KEMBAR lintas akun.
+     * Sedikit di bawah ambang verifikasi (0,55) karena template pembanding
+     * adalah rata-rata 3 pose (bisa sedikit lebih jauh dari frame tunggal),
+     * tetapi tetap jauh di atas similarity antar orang berbeda.
+     */
+    public static final double AMBANG_WAJAH_KEMBAR = 0.50;
+
     /** Instruksi pose per tahap, urut. */
     public static final String[] INSTRUKSI_POSE = {
             "Foto 1: hadapkan wajah lurus ke kamera.",
@@ -108,6 +116,26 @@ public class RegistrasiWajahService {
      * @return hasil berisi pesan siap tampil + berhasil/tidak.
      */
     public synchronized HasilAmbil ambilDariFrame(BufferedImage frameKamera) {
+        return ambilDariFrame(frameKamera, 0);
+    }
+
+    /**
+     * Proses SATU frame kamera untuk tahap berikutnya, dengan pemeriksaan
+     * tambahan yang butuh identitas akun.
+     *
+     * <p>Aturan tambahan (permintaan pengguna §16):
+     * <ul>
+     *   <li>POSE WAJIB SESUAI instruksi tahap: foto 1 lurus, foto 2 menoleh
+     *       KIRI fisik, foto 3 menoleh KANAN fisik. Lurus terus saat diminta
+     *       menoleh akan DITOLAK.</li>
+     *   <li>WAJAH KEMBAR lintas akun ditolak: bila embedding mirip template
+     *       milik karyawan LAIN, registrasi dibatalkan (satu wajah satu akun).</li>
+     * </ul>
+     *
+     * @param idKaryawanLogin id karyawan sesi login; bila &lt;= 0 pemeriksaan
+     *                        duplikat lintas akun dilewati (dipakai uji lama).
+     */
+    public synchronized HasilAmbil ambilDariFrame(BufferedImage frameKamera, int idKaryawanLogin) {
         if (lengkap()) {
             return HasilAmbil.gagal("Registrasi sudah lengkap 3/3. "
                     + "Tekan \"Selesaikan Registrasi\".");
@@ -142,7 +170,31 @@ public class RegistrasiWajahService {
                         + "/100). Perbaiki pencahayaan atau dekatkan wajah, lalu ulangi.");
             }
 
+            // 1. Hitung embedding dulu, lalu tolak WAJAH KEMBAR lintas akun
+            //    sebelum apa pun — satu wajah hanya boleh satu akun.
             float[] emb = OpenCvBridge.hitungEmbedding(mat.submat(area));
+
+            if (idKaryawanLogin > 0) {
+                WajahDAO.TemplateWajah kembar;
+                try {
+                    kembar = cariKembarLintasAkun(emb, idKaryawanLogin);
+                } catch (Exception e) {
+                    return HasilAmbil.gagal("Gagal memeriksa duplikat wajah: "
+                            + e.getMessage() + ". Coba lagi.");
+                }
+                if (kembar != null) {
+                    return HasilAmbil.gagal("Wajah ini sudah terdaftar pada akun "
+                            + aman(kembar.namaKaryawan) + " (ID " + kembar.idKaryawan
+                            + "). Satu wajah hanya boleh terdaftar pada SATU akun. "
+                            + "Registrasi dibatalkan.");
+                }
+            }
+
+            // 2. POSE harus sesuai instruksi tahap ini (bukan sekadar teks).
+            String galatPose = periksaPose(w, sampel.size());
+            if (galatPose != null) {
+                return HasilAmbil.gagal(galatPose);
+            }
 
             ByteArrayOutputStream buf = new ByteArrayOutputStream();
             javax.imageio.ImageIO.write(frameKamera, "jpg", buf);
@@ -167,6 +219,89 @@ public class RegistrasiWajahService {
     }
 
     /**
+     * Ambang |offset| untuk registrasi: di bawah ini dianggap menghadap
+     * LURUS, di atas ini dianggap menoleh (arah sesuai tanda). Dibuat lebih
+     * besar dari ambang liveness karena foto registrasi butuh pose jelas,
+     * sementara wajah "cukup lurus" saja (±0,1) masih wajar untuk foto 1.
+     */
+    private static final double AMBANG_TOLEH_REGISTRASI = 0.12;
+
+    /**
+     * Label arah memakai ambang REGISTRASI (bukan ambang netral liveness yang
+     * lebih kecil), supaya pesan tidak menyebut "menoleh" untuk wajah yang
+     * sebenarnya masih dianggap lurus oleh aturan registrasi.
+     */
+    private static String labelPoseRegistrasi(double offset) {
+        if (offset >= AMBANG_TOLEH_REGISTRASI) return "KIRI";
+        if (offset <= -AMBANG_TOLEH_REGISTRASI) return "KANAN";
+        return "DEPAN";
+    }
+
+    /**
+     * Periksa pose wajah terhadap instruksi tahap ke-{@code indeks} (0-based).
+     *
+     * @return null bila pose sudah sesuai; pesan penolakan bila belum.
+     */
+    private static String periksaPose(OpenCvBridge.WajahTerdeteksi w, int indeks) {
+        LivenessService.PoseWajah pose = LivenessService.poseDari(w);
+        if (pose == null || !pose.berlandmark) {
+            return "Landmark wajah tidak terbaca, jadi pose tidak dapat dinilai. "
+                    + "Dekatkan wajah ke kamera dengan pencahayaan cukup, lalu ulangi.";
+        }
+        double o = pose.offset;
+        String arah = labelPoseRegistrasi(o);
+        if (indeks == 0) {
+            // Foto 1: wajah lurus ke kamera.
+            if (Math.abs(o) >= AMBANG_TOLEH_REGISTRASI) {
+                return String.format(
+                        "Pose belum sesuai: foto 1 harus menghadap LURUS ke kamera, "
+                                + "tapi terdeteksi menoleh ke %s. Hadapkan wajah lurus "
+                                + "lalu ambil ulang.", arah);
+            }
+            return null;
+        }
+        String diminta = (indeks == 1) ? "KIRI" : "KANAN";
+        boolean sesuai = (indeks == 1)
+                ? o >= AMBANG_TOLEH_REGISTRASI      // positif = menoleh KIRI fisik
+                : o <= -AMBANG_TOLEH_REGISTRASI;    // negatif = menoleh KANAN fisik
+        if (!sesuai) {
+            return String.format(
+                    "Pose belum sesuai: foto %d harus menoleh ke %s Anda, tapi "
+                            + "terdeteksi %s. Putar kepala lebih jelas ke %s lalu "
+                            + "ambil ulang.", indeks + 1, diminta, arah, diminta);
+        }
+        return null;
+    }
+
+    /**
+     * Cari template milik karyawan LAIN yang mirip dengan embedding ini
+     * (wajah kembar lintas akun).
+     *
+     * @return template pemiliknya, atau null bila tidak ada yang cocok.
+     */
+    private WajahDAO.TemplateWajah cariKembarLintasAkun(float[] emb, int idKaryawanLogin)
+            throws Exception {
+        for (WajahDAO.TemplateWajah lain : wajahDAO.muatSemuaTemplateKecuali(idKaryawanLogin)) {
+            double sim = WajahVerifier.cosine(emb, lain.embedding);
+            if (sim >= AMBANG_WAJAH_KEMBAR) {
+                return lain;
+            }
+        }
+        return null;
+    }
+
+    private static String aman(String s) {
+        return (s == null || s.trim().isEmpty()) ? "(tanpa nama)" : s.trim();
+    }
+
+    /** Salinan embedding seluruh sampel sesi (urut, untuk perhitungan rata-rata). */
+    private synchronized List<float[]> semuaEmbedding() {
+        List<float[]> hasil = new ArrayList<>();
+        for (Sampel s : sampel) hasil.add(s.embedding);
+        return hasil;
+    }
+
+    /**
      * Selesaikan registrasi untuk karyawan yang sedang login.
      *
      * <p>Menulis template embedding ke DB (upsert, satu baris per karyawan)
@@ -182,6 +317,22 @@ public class RegistrasiWajahService {
         }
         if (idKaryawanLogin <= 0) {
             return "Sesi login tidak valid. Login ulang lalu coba lagi.";
+        }
+
+        // Pengaman TERAKHIR: sebelum menulis, pastikan template rata-rata tidak
+        // mirip milik akun lain (bisa lolos bila template akun lain didaftarkan
+        // setelah foto-foto sesi ini diambil).
+        // Dijalankan SEBELUM transaksi tulis supaya tidak ada efek samping.
+        try {
+            float[] templateUji = WajahDAO.rataRata(semuaEmbedding());
+            WajahDAO.TemplateWajah kembar = cariKembarLintasAkun(templateUji, idKaryawanLogin);
+            if (kembar != null) {
+                return "Wajah ini sudah terdaftar pada akun " + aman(kembar.namaKaryawan)
+                        + " (ID " + kembar.idKaryawan + "). Satu wajah hanya boleh "
+                        + "terdaftar pada SATU akun. Registrasi dibatalkan.";
+            }
+        } catch (Exception e) {
+            return "Gagal memeriksa duplikat wajah sebelum menyimpan: " + e.getMessage();
         }
 
         List<float[]> embeddingSampel = new ArrayList<>();

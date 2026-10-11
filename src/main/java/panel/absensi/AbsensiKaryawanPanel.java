@@ -87,9 +87,17 @@ public class AbsensiKaryawanPanel extends JPanel {
     private boolean lokasiLolos;
     private LocationProvider.HasilLokasiPengguna lokasiTerakhir;
 
+    // ---- verifikasi wajah otomatis (tanpa tombol): berjalan periodik selama
+    // kamera aktif dan belum terverifikasi. Tidak pernah MENYIMPAN absensi —
+    // penyimpanan tetap hanya lewat tombol Absen Masuk/Pulang.
+    private final javax.swing.Timer timerVerifikasiOtomatis;
+    private boolean verifikasiBerjalan;
+    /** Status wajah terakhir yang sudah dicatat — agar log tidak dibanjiri. */
+    private String statusWajahTerakhir;
+
     private final JLabel lblPreview = new JLabel("Kamera belum dinyalakan", JLabel.CENTER);
     private final JLabel lblStatusKamera = AbsensiUI.label("Kamera: belum dinyalakan");
-    private final JLabel lblStatusWajah = AbsensiUI.label("Wajah: belum diperiksa");
+    private final JLabel lblStatusWajah = AbsensiUI.label("Wajah: otomatis — hadapkan wajah ke kamera");
     private final JLabel lblStatusLiveness = AbsensiUI.label("Liveness: belum dimulai");
     private final JLabel lblInstruksiLiveness = new JLabel(" ");
     private final JLabel lblJarak = AbsensiUI.label("Jarak ke kantor: -");
@@ -103,7 +111,8 @@ public class AbsensiKaryawanPanel extends JPanel {
     private final JTextArea areaCatatan = new JTextArea(4, 30);
 
     private final JButton btnKamera = AbsensiUI.tombol("Mulai Kamera", AbsensiUI.AKSEN_BIRU);
-    private final JButton btnVerifikasi = AbsensiUI.tombol("Verifikasi Wajah", AbsensiUI.AKSEN);
+    // Tombol "Verifikasi Wajah" dihapus: verifikasi kini OTOMATIS tanpa tombol
+    // (timerVerifikasiOtomatis + verifikasiOtomatis()). Label status wajah tetap ada.
     private final JButton btnLokasi = AbsensiUI.tombolNetral("Perbarui Lokasi");
     private final JButton btnAbsenMasuk = AbsensiUI.tombol("Absen Masuk", AbsensiUI.HIJAU);
     private final JButton btnAbsenPulang = AbsensiUI.tombol("Absen Pulang", AbsensiUI.AMBER);
@@ -125,6 +134,14 @@ public class AbsensiKaryawanPanel extends JPanel {
         timerJam = new Timer(1000, e -> perbaruiJam());
         timerJam.start();
         perbaruiJam();
+
+        // Verifikasi wajah OTOMATIS: dijalankan berkala selama kamera aktif dan
+        // wajah belum terverifikasi. Ini HANYA memeriksa identitas — tidak
+        // pernah mengambil foto dan tidak pernah menyimpan absensi. Penyimpanan
+        // tetap sepenuhnya lewat tombol Absen Masuk / Absen Pulang.
+        timerVerifikasiOtomatis = new javax.swing.Timer(4000, e -> verifikasiOtomatis());
+        timerVerifikasiOtomatis.setRepeats(true);
+
         sambungkanKamera();
         pasangAksiKamera();
 
@@ -449,7 +466,7 @@ public class AbsensiKaryawanPanel extends JPanel {
         JPanel kartu = AbsensiUI.kartu();
         JPanel atas = new JPanel(new BorderLayout());
         atas.setOpaque(false);
-        atas.add(AbsensiUI.judulBagian("Verifikasi wajah (preview mirror)"), BorderLayout.WEST);
+        atas.add(AbsensiUI.judulBagian("Verifikasi wajah otomatis (preview mirror)"), BorderLayout.WEST);
         JPanel chip = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         chip.setOpaque(false);
         chip.add(lblChipWajah);
@@ -486,7 +503,6 @@ public class AbsensiKaryawanPanel extends JPanel {
         JPanel barisTombol = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 6));
         barisTombol.setOpaque(false);
         barisTombol.add(btnKamera);
-        barisTombol.add(btnVerifikasi);
         bawah.add(Box.createVerticalStrut(4));
         bawah.add(barisTombol);
         kartu.add(bawah, BorderLayout.SOUTH);
@@ -642,6 +658,10 @@ public class AbsensiKaryawanPanel extends JPanel {
             if (kamera.berjalan()) {
                 kamera.berhenti();
                 liveness.batal();
+                timerVerifikasiOtomatis.stop();
+                verifikasiBerjalan = false;
+                statusWajahTerakhir = null;
+                wajahTerverifikasi = false;
                 lblPreview.setIcon(null);
                 lblPreview.setText("Kamera dimatikan");
                 lblStatusKamera.setText("Kamera: dimatikan");
@@ -651,6 +671,7 @@ public class AbsensiKaryawanPanel extends JPanel {
                 if (kamera.mulai()) {
                     // mulai tantangan liveness baru setiap kali kamera menyala
                     liveness.mulai();
+                    timerVerifikasiOtomatis.start();   // verifikasi wajah otomatis
                     lblStatusLiveness.setText("Liveness: " + liveness.instruksi());
                     lblInstruksiLiveness.setText("Arah diminta: " + liveness.labelArahDiminta()
                             + " (kanan/kiri fisik Anda, bukan sisi layar).");
@@ -667,7 +688,6 @@ public class AbsensiKaryawanPanel extends JPanel {
             perbaruiKesiapan();
         });
 
-        btnVerifikasi.addActionListener(e -> verifikasiPenuh());
         btnLokasi.addActionListener(e -> perbaruiLokasi());
         btnAbsenMasuk.addActionListener(e -> simpanAbsensi(true));
         btnAbsenPulang.addActionListener(e -> simpanAbsensi(false));
@@ -678,15 +698,36 @@ public class AbsensiKaryawanPanel extends JPanel {
 
     // ------------------------------------------------------------ verifikasi
 
+    /**
+     * Verifikasi wajah OTOMATIS (tanpa tombol). Dipanggil berkala oleh
+     * {@code timerVerifikasiOtomatis}. Wajah yang terlihat jelas langsung
+     * diverifikasi; bila cocok, tombol Absen Masuk/Pulang AKTIF sendiri.
+     *
+     * <p>Method ini HANYA memeriksa identitas. Ia tidak mengambil foto, tidak
+     * mengirim apa pun, dan yang terpenting TIDAK PERNAH menyimpan absensi —
+     * absen tetap hanya tercatat saat tombol Absen Masuk/Pulang ditekan.
+     */
+    private void verifikasiOtomatis() {
+        if (!kamera.berjalan()) return;
+        if (verifikasiBerjalan) return;      // jangan tumpuk pemeriksaan
+        if (wajahTerverifikasi) return;      // sudah cocok, tidak perlu ulang
+        if (btnAbsenMasuk.isEnabled() || btnAbsenPulang.isEnabled()) return;
+        verifikasiPenuh();
+    }
+
     /** Deteksi + liveness + identitas, di background. */
     private void verifikasiPenuh() {
         BufferedImage frame = kamera.frameTerakhir();
         if (frame == null) {
-            catat("Belum ada gambar kamera. Tekan \"Mulai Kamera\" dulu.");
+            // Otomatis: jangan banjiri catatan; cukup tunggu frame berikutnya.
+            if (!verifikasiBerjalan) {
+                lblStatusWajah.setText("Wajah: menunggu gambar kamera...");
+            }
             return;
         }
-        btnVerifikasi.setEnabled(false);
-        btnVerifikasi.setText("Memeriksa...");
+        verifikasiBerjalan = true;
+        lblStatusWajah.setText("Wajah: memeriksa otomatis...");
+        lblStatusWajah.setForeground(AbsensiUI.TEKS_LEMBUT);
         new SwingWorker<WajahVerifier.HasilVerifikasi, Void>() {
             @Override protected WajahVerifier.HasilVerifikasi doInBackground() {
                 try {
@@ -722,10 +763,10 @@ public class AbsensiKaryawanPanel extends JPanel {
             }
 
             @Override protected void done() {
-                btnVerifikasi.setText("Verifikasi Wajah");
-                btnVerifikasi.setEnabled(true);
+                verifikasiBerjalan = false;
                 try {
                     WajahVerifier.HasilVerifikasi h = get();
+                    boolean cocokBaru = h.cocok() && !wajahTerverifikasi;
                     wajahTerverifikasi = h.cocok();
                     skorWajahTerverifikasi = h.similarity;
                     lblStatusWajah.setText("Wajah: " + h.pesan);
@@ -738,8 +779,17 @@ public class AbsensiKaryawanPanel extends JPanel {
                     } else {
                         setChip(lblChipWajah, "Wajah tidak cocok", AbsensiUI.MERAH);
                     }
-                    catat(h.pesan + (h.similarity >= 0
-                            ? String.format("  (skor %.2f)", h.similarity) : ""));
+                    // Catat hanya saat status berubah (hindari banjir log tiap 4 detik).
+                    if (!h.status.equals(statusWajahTerakhir)) {
+                        statusWajahTerakhir = h.status;
+                        catat(h.pesan + (h.similarity >= 0
+                                ? String.format("  (skor %.2f)", h.similarity) : ""));
+                    }
+                    if (cocokBaru) {
+                        catat("Verifikasi otomatis selesai. Silakan pilih tombol "
+                                + "\"Absen Masuk\" atau \"Absen Pulang\" — foto bukti "
+                                + "baru diambil saat tombol ditekan.");
+                    }
                 } catch (Exception ex) {
                     catat("Verifikasi gagal: " + ex.getMessage());
                 } finally {
@@ -1011,6 +1061,7 @@ public class AbsensiKaryawanPanel extends JPanel {
     @Override
     public void removeNotify() {
         timerJam.stop();
+        timerVerifikasiOtomatis.stop();
         liveness.batal();
         kamera.berhenti();
         super.removeNotify();
